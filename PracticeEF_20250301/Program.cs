@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace PracticeEF_20250301
 {
@@ -16,21 +17,40 @@ namespace PracticeEF_20250301
     {
         static void Main(string[] args)
         {
-            
+            using (ApplicationContext db = new ApplicationContext())
+            {
+                List<User> users = new List<User>
+                {
+                    new User{Name = "Tanaka", Age = 30, Position = Position.Manager},
+                    new User{Name = "Suzuki", Age = 35, Position = Position.Designer}
+                };
+                db.Users.AddRange(users);
+                db.SaveChanges();
+            }
         }
     }
 
     public class User
     {
         public int Id { get; set; }
+        [Required]
         public string Name { get; set; }
         public int Age { get; set; }
-        public string Position { get; set; }
+        public Position Position { get; set; }
     }
-
+    public enum Position : int
+    {
+        Manager,
+        Designer
+    }
     public class  ApplicationContext : DbContext
     {
         public DbSet<User> Users { get; set; } = null!;
+        public ApplicationContext()
+        {
+            Database.EnsureDeleted();
+            Database.EnsureCreated();
+        }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -42,6 +62,8 @@ namespace PracticeEF_20250301
             modelBuilder.Entity<User>().HasAlternateKey(e => new { e.Id, e.Name });
             modelBuilder.Entity<User>().Property(e => e.Position).HasMaxLength(70);
             modelBuilder.Entity<User>().ToTable(e => e.HasCheckConstraint("Age", "Age > 0 AND Age < 100"));
+            modelBuilder.Entity<User>().ToTable(e => e.HasCheckConstraint("Position", $"Position in ({(int)Position.Manager},{(int)Position.Designer})"));
+            modelBuilder.Entity<User>().Property(e => e.Id).HasColumnName("UserId");
             base.OnModelCreating(modelBuilder);
         }
     }
