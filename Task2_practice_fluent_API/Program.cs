@@ -89,6 +89,7 @@ Description (текст, необязательное поле)
             modelBuilder.Entity<Product>().ToTable("StoreProducts");
             //Добавьте ограничение: Price не может быть отрицательным(HasCheckConstraint()).
             modelBuilder.Entity<Product>().ToTable(p => p.HasCheckConstraint("Price", "Price > 0"));
+            //modelBuilder.Entity<Product>().Property(p => p.Price).HasColumnType("decimal(10,2)");
             base.OnModelCreating(modelBuilder);
         }
     }
