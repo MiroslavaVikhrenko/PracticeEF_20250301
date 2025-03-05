@@ -31,6 +31,8 @@ namespace Task5_20250305
             modelBuilder.Entity<User>().Property(p => p.UserName).IsRequired();
             modelBuilder.Entity<User>().Property(p => p.Hashed_Password).IsRequired();
             modelBuilder.Entity<User>().Property(p => p.Salt).IsRequired();
+            modelBuilder.Entity<Book>().Property(b => b.Description).HasMaxLength(255);
+            modelBuilder.Entity<Book>().Property(b => b.Title).HasMaxLength(255);
             base.OnModelCreating(modelBuilder);
         }
     }

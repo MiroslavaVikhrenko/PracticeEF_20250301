@@ -25,7 +25,7 @@ namespace Task5_20250305
          */
         static void Main(string[] args)
         {
-            AddUser("tanaka", "123Abc#@");
+            //AddUser("tanaka", "123Abc#@");
             
             List<Book> books = new List<Book>
             {
@@ -40,8 +40,178 @@ namespace Task5_20250305
                 new Book{Title="I Am a Cat", Author="Natsume Soseki", Description="A humorous and philosophical novel narrated by a sardonic cat who observes and critiques the absurdities of human society in Meiji-era Japan."},
                 new Book{Title="Kafka on the Shore", Author="Haruki Murakami", Description="A dreamlike and enigmatic novel intertwining the journeys of a runaway teenage boy and an elderly man who can talk to cats, blending reality and metaphysical elements."}
             };
-            AddBooks(books);
-            
+            //AddBooks(books);
+
+
+            if (DisplayLoginMenu())
+            {
+                DisplayBooksMenu();
+            }
+
+        }
+
+        public static void SearchForACertainBook()
+        {
+            Console.Clear();
+            Console.WriteLine("enter a title of book you are looking for:");
+            string search = Console.ReadLine();
+
+            using (ApplicationContext db = new ApplicationContext())
+            {
+
+            }
+
+        }
+        public static void ShowAllBooks()
+        {
+            int pageSize = 5; // Number of books per page
+            int currentPage = 1; // Start at page 1
+
+            using (ApplicationContext db = new ApplicationContext())
+            {
+                int totalBooks = db.Books.Count();
+                int totalPages = (int)Math.Ceiling((double)totalBooks / pageSize);
+
+                while (true)
+                {
+                    Console.Clear(); // Clear console for better readability
+                    Console.WriteLine($"Page {currentPage} of {totalPages}");
+
+                    var books = db.Books
+                        .OrderBy(b => b.Id) // Ensure consistent ordering
+                        .Skip((currentPage - 1) * pageSize)
+                        .Take(pageSize)
+                        .ToList();
+
+                    foreach (var book in books)
+                    {
+                        Console.WriteLine($"{book.ToString()}\n");
+                    }
+
+                    Console.WriteLine("\nOptions:");
+                    if (currentPage > 1) Console.WriteLine("Type 'prev' to go to the previous page.");
+                    if (currentPage < totalPages) Console.WriteLine("Type 'next' to go to the next page.");
+                    Console.WriteLine("Type 'exit' to close the program.");
+
+                    Console.Write("\nEnter your choice: ");
+                    string choice = Console.ReadLine().ToLower();
+
+                    if (choice == "next" && currentPage < totalPages)
+                    {
+                        currentPage++;
+                    }
+                    else if (choice == "prev" && currentPage > 1)
+                    {
+                        currentPage--;
+                    }
+                    else if (choice == "exit")
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Invalid input. Press any key to try again...");
+                        Console.ReadKey();
+                    }
+                }
+            }
+
+        }
+        public static void DisplayBooksMenu()
+        {
+            Console.Clear();
+            Console.WriteLine("\nBook Menu:");
+            Console.WriteLine("1. Show All Books");
+            Console.WriteLine("2. Search for a Certain Book");
+            Console.WriteLine("3. Exit");
+            Console.Write("Enter your choice: ");
+            string choice = Console.ReadLine();
+            Console.WriteLine();
+
+            switch (choice)
+            {
+                case "1":
+                    ShowAllBooks();
+                    break;
+                case "2":
+                    SearchForACertainBook();
+                    break;
+                case "3":
+                    Console.WriteLine("Exiting program...");
+                    return;
+                default:
+                    Console.WriteLine("Invalid choice, please try again.");
+                    break;
+            }
+        }
+        public static bool DisplayLoginMenu()
+        {
+            int count = 0;
+            while (count < 3)
+            {
+                Console.Clear();
+                Console.WriteLine("Please enter your username:");
+                string username = Console.ReadLine();
+                Console.WriteLine("Please enter your password:");
+                string password = Console.ReadLine();
+
+                if (!Login(username, password))
+                {
+                    count++;
+                    if (count < 3)
+                    {
+                        Console.WriteLine("Try again");
+                        Console.ReadKey();
+                        if (count == 2)
+                        {
+                            Console.WriteLine("You have the last attempt, be careful!");
+                            Console.ReadKey();
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("That was the last attempt!");
+                    }
+                    
+                }
+                else
+                {
+                    return true;
+                }
+            }
+            if (count >= 3)
+            {
+                Console.WriteLine("You entered wrong credentials 3 times, you are blocked!");
+                Console.ReadKey();
+                return false;
+            }
+            return false;
+        }
+
+        public static bool Login(string username, string password)
+        {
+            using (ApplicationContext db = new ApplicationContext())
+            {
+                var user = db.Users.FirstOrDefault(u => u.UserName == username);
+                if (user != null)
+                {
+                    string salt = user.Salt;
+                    string hashedPassword2 = SecurityHelper.HashPassword(password, salt, 10101, 70);
+                    if (hashedPassword2 == user.Hashed_Password)
+                    {
+                        Console.WriteLine($"User {user.UserName} successfully logged in");
+                        Console.ReadKey();
+                        return true;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Incorrect credentials");
+                        Console.ReadKey();
+                        return false;
+                    }
+                }
+            }
+            return false;
         }
 
         public static void AddBooks(List<Book> books)
