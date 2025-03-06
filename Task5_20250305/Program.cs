@@ -58,7 +58,19 @@ namespace Task5_20250305
 
             using (ApplicationContext db = new ApplicationContext())
             {
-
+                var book = db.Books.FirstOrDefault(b => b.Title == search);
+                if (book != null)
+                {
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine(book.ToString());
+                    Console.ResetColor();
+                }
+                else
+                {
+                    Console.WriteLine("No such book found!");
+                }
+                Console.ReadKey();
+                DisplayBooksMenu();
             }
 
         }
@@ -85,13 +97,16 @@ namespace Task5_20250305
 
                     foreach (var book in books)
                     {
+                        Console.ForegroundColor = ConsoleColor.Yellow;
                         Console.WriteLine($"{book.ToString()}\n");
+                        Console.ResetColor();
                     }
 
                     Console.WriteLine("\nOptions:");
                     if (currentPage > 1) Console.WriteLine("Type 'prev' to go to the previous page.");
                     if (currentPage < totalPages) Console.WriteLine("Type 'next' to go to the next page.");
                     Console.WriteLine("Type 'exit' to close the program.");
+                    Console.WriteLine("Type 'menu' to get back to the menu");
 
                     Console.Write("\nEnter your choice: ");
                     string choice = Console.ReadLine().ToLower();
@@ -106,7 +121,11 @@ namespace Task5_20250305
                     }
                     else if (choice == "exit")
                     {
-                        break;
+                        Environment.Exit(0);
+                    }
+                    else if (choice == "menu")
+                    {
+                        DisplayBooksMenu();
                     }
                     else
                     {
