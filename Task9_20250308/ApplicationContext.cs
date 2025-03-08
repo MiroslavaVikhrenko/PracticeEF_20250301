@@ -13,8 +13,8 @@ namespace Task9_20250308
         public DbSet<Shop> Shops { get; set; } = null!;
         public ApplicationContext()
         {
-            //Database.EnsureDeleted();
-            //Database.EnsureCreated();
+            Database.EnsureDeleted();
+            Database.EnsureCreated();
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
