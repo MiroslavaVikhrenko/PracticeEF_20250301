@@ -14,20 +14,20 @@ namespace Task9_20250308
          */
         static void Main(string[] args)
         {
-            //1) Установка главной сущности по навигационному свойству зависимой сущности.
-            SetMainEntityByDependentEntityNavProp();
-            //2) Установка главной сущности по свойству-внешнему ключу зависимой сущности.
-            SetMainEntityByForeignKeyPropOfDependentEntity();
-            //3) Установка зависимой сущности через навигационное свойство главной сущности.
-            SetDependentEntityByNavPropOfMainEntity();
-
+            using (ApplicationContext db = new ApplicationContext())
+            {
+                //1) Установка главной сущности по навигационному свойству зависимой сущности.
+                SetMainEntityByDependentEntityNavProp(db);
+                //2) Установка главной сущности по свойству-внешнему ключу зависимой сущности.
+                SetMainEntityByForeignKeyPropOfDependentEntity(db);
+                //3) Установка зависимой сущности через навигационное свойство главной сущности.
+                SetDependentEntityByNavPropOfMainEntity(db);
+            }         
         }
 
         //3) Установка зависимой сущности через навигационное свойство главной сущности.
-        public static void SetDependentEntityByNavPropOfMainEntity()
+        public static void SetDependentEntityByNavPropOfMainEntity(ApplicationContext db)
         {
-            using (ApplicationContext db = new ApplicationContext())
-            {
                 Game game1 = new Game { Name = "Purple game" };
                 Game game2 = new Game { Name = "Blue game" };
                 Game game3 = new Game { Name = "Red game" };
@@ -45,15 +45,12 @@ namespace Task9_20250308
                 {
                     Console.WriteLine($"{game.Name} is in {game.Shop?.Name}");
                 }
-            }
         }
 
 
         //2) Установка главной сущности по свойству-внешнему ключу зависимой сущности.
-        public static void SetMainEntityByForeignKeyPropOfDependentEntity()
+        public static void SetMainEntityByForeignKeyPropOfDependentEntity(ApplicationContext db)
         {
-            using (ApplicationContext db = new ApplicationContext())
-            {
                 Shop shop1 = new Shop { Name = "Sakura shop" };
                 Shop shop2 = new Shop { Name = "Camelia shop" };
                 db.Shops.AddRange(shop1, shop2);  // add shops
@@ -72,14 +69,12 @@ namespace Task9_20250308
                 {
                     Console.WriteLine($"{game.Name} is in {game.Shop?.Name}");
                 }
-            }
         }
 
         //1) Установка главной сущности по навигационному свойству зависимой сущности.
-        public static void SetMainEntityByDependentEntityNavProp()
+        public static void SetMainEntityByDependentEntityNavProp(ApplicationContext db)
         {
-            using (ApplicationContext db = new ApplicationContext())
-            {
+            
                 Shop shop1 = new Shop { Name = "Rose shop" };
                 Shop shop2 = new Shop { Name = "Violet shop" };
                 Game game1 = new Game { Name = "Black game", Shop = shop1 };
@@ -96,7 +91,6 @@ namespace Task9_20250308
                 {
                     Console.WriteLine($"{game.Name} is in {game.Shop?.Name}");
                 }
-            }
         }
     }
 }
