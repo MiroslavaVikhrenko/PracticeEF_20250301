@@ -20,7 +20,28 @@
     {
         static void Main(string[] args)
         {
+            using (ApplicationContext db = new ApplicationContext())
+            {
+                Customer c1 = new Customer() { Name = "Tanaka" };
+                Customer c2 = new Customer() { Name = "Yamada" };
+                Customer c3 = new Customer() { Name = "Sato" };
+                Customer c4 = new Customer() { Name = "Fujita" };
 
+                Company co1 = new Company() { Name = "Canadian company" };
+                Company co2 = new Company() { Name = "American company" };
+                Company co3 = new Company() { Name = "French company" };
+
+                Shop s1 = new Shop() { Name = "Black Shop", Company = co1, Customers = new List<Customer>() { c1, c2} };
+                Shop s2 = new Shop() { Name = "White Shop", Company = co1, Customers = new List<Customer>() { c2, c3} };
+                Shop s3 = new Shop() { Name = "Green Shop", Company = co2, Customers = new List<Customer>() { c1, c3, c4 } };
+                Shop s4 = new Shop() { Name = "Blue Shop", Company = co3, Customers = new List<Customer>() { c1, c2, c4 } };
+                Shop s5 = new Shop() { Name = "Violet Shop", Company = co3, Customers = new List<Customer>() { c1, c2, c3 } };
+                Shop s6 = new Shop() { Name = "Orange Shop", Company = co3, Customers = new List<Customer>() { c1, c2, c3, c4 } };
+                db.Customers.AddRange(c1, c2, c3, c4);
+                db.Companies.AddRange(co1, co2, co3);
+                db.Shops.AddRange(s1, s2, s3, s4, s5, s6);
+                db.SaveChanges();
+            }
         }
     }
 
