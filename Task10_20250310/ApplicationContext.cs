@@ -14,8 +14,8 @@ namespace Task10_20250310
         public DbSet<Customer> Customers { get; set; } = null!;
         public ApplicationContext()
         {
-            Database.EnsureDeleted();
-            Database.EnsureCreated();
+            //Database.EnsureDeleted();
+            //Database.EnsureCreated();
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
