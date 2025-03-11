@@ -35,8 +35,8 @@ namespace Task10_20250310
                 //Company co2 = new Company() { Name = "American company" };
                 //Company co3 = new Company() { Name = "French company" };
 
-                //Shop s1 = new Shop() { Name = "Black Shop", Company = co1, Customers = new List<Customer>() { c1, c2} };
-                //Shop s2 = new Shop() { Name = "White Shop", Company = co1, Customers = new List<Customer>() { c2, c3} };
+                //Shop s1 = new Shop() { Name = "Black Shop", Company = co1, Customers = new List<Customer>() { c1, c2 } };
+                //Shop s2 = new Shop() { Name = "White Shop", Company = co1, Customers = new List<Customer>() { c2, c3 } };
                 //Shop s3 = new Shop() { Name = "Green Shop", Company = co2, Customers = new List<Customer>() { c1, c3, c4 } };
                 //Shop s4 = new Shop() { Name = "Blue Shop", Company = co3, Customers = new List<Customer>() { c1, c2, c4 } };
                 //Shop s5 = new Shop() { Name = "Violet Shop", Company = co3, Customers = new List<Customer>() { c1, c2, c3 } };
@@ -73,38 +73,40 @@ namespace Task10_20250310
                             Console.WriteLine($"-----------{customer.Name}");
                         }
                     }
-                    
-                }
 
-                //2) Отобразите информацию о покупателях.
-                //Фио пользователя, список магазинов и их компаний.
+                    //}
 
-                Console.WriteLine("..................................................");
+                    //2) Отобразите информацию о покупателях.
+                    //Фио пользователя, список магазинов и их компаний.
 
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("Customer - its shops - shops' companies");
-                Console.ResetColor();
-
-                var customers = db.Customers
-                    .Include(c => c.Shops)
-                    .ThenInclude(s => s.Company)
-                    .ToList();
-
-                foreach (var customer in customers)
-                {
                     Console.WriteLine("..................................................");
-                    Console.WriteLine($"{customer.Name}:");
-                    foreach (var shop in customer.Shops)
+
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine("Customer - its shops - shops' companies");
+                    Console.ResetColor();
+
+                    var customers = db.Customers
+                        .Include(c => c.Shops)
+                        .ThenInclude(s => s.Company)
+                        .ToList();
+
+                    foreach (var customer in customers)
                     {
-                        Console.WriteLine($"-----{shop.Name}:");
-                        Console.WriteLine($"-----------{shop.Company.Name}");
+                        Console.WriteLine("..................................................");
+                        Console.WriteLine($"{customer.Name}:");
+                        foreach (var shop in customer.Shops)
+                        {
+                            Console.WriteLine($"-----{shop.Name}:");
+                            Console.WriteLine($"-----------{shop.Company.Name}");
+                        }
+
                     }
-                    
                 }
             }
         }
-    }
 
+        
+    }
     public class Customer
     {
         public int Id { get; set; }

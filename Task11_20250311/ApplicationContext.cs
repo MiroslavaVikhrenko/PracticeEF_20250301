@@ -28,10 +28,10 @@ namespace Task11_20250311
             modelBuilder.Entity<UserSettings>().Property(u => u.Name).IsRequired();
 
             modelBuilder.Entity<User>()
-            .HasOne(u => u.UserSettings)  // User has one Usersettings
-            .WithOne(us => us.User)  // UserSettings has one User
-            //.HasForeignKey(u => u.UserSettingsId)
-            .OnDelete(DeleteBehavior.Cascade); // Cascade delete
+            .HasOne(u => u.UserSettings)   // User has one UserSettings
+            .WithOne(us => us.User)        // UserSettings has one User
+            .HasForeignKey<UserSettings>(us => us.UserId)  // Foreign Key is in UserSettings
+            .OnDelete(DeleteBehavior.Cascade);  // Enable cascade delete
 
             base.OnModelCreating(modelBuilder);
         }
