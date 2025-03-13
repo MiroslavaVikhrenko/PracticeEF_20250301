@@ -1,4 +1,7 @@
-﻿namespace Task12_20250313
+﻿using Microsoft.EntityFrameworkCore;
+using System.Linq;
+
+namespace Task12_20250313
 {
     /*
      Создайте базу данных, представляющую информацию о «Компаниях», их «Сотрудниках» и «Проектах». 
@@ -11,27 +14,66 @@
     {
         static void Main(string[] args)
         {
+            //using (ApplicationContext db = new ApplicationContext())
+            //{
+            //Employee e = new Employee() { Name = "tom" };
+            //Employee e2 = new Employee() { Name = "sophia" };
+            //Employee e3 = new Employee() { Name = "adam" };
+            //Employee e4 = new Employee() { Name = "lisa" };
+
+            //Company c = new Company() { Name = "Google", Employees = new List<Employee>() { e, e2 } };
+            //Company c2 = new Company() { Name = "Microsoft", Employees = new List<Employee>() { e3, e4 } };
+
+            //Project p = new Project() { Name = "P1", Employees = new List<Employee>() { e, e2 } };
+            //Project p2 = new Project() { Name = "P2", Employees = new List<Employee>() { e, e3, e4 } };
+            //Project p3 = new Project() { Name = "P3", Employees = new List<Employee>() { e2, e4 } };
+            //Project p4 = new Project() { Name = "P4", Employees = new List<Employee>() { e3, e4 } };
+            //Project p5 = new Project() { Name = "P5", Employees = new List<Employee>() { e, e2, e4 } };
+            //db.Employees.AddRange(e, e2, e3, e4);
+            //db.Projects.AddRange(p, p2, p3, p4, p5);
+            //db.Companies.AddRange(c, c2);
+            //db.SaveChanges();
+
+
+            //}
+            GetProjectsByCompany("Google");
+            GetProjectsByCompany("Microsoft");
+        }
+        // Необходимо создать запрос с использованием Entity Framework Core для получения списка проектов, 
+        // в которых участвуют сотрудники из определенной компании.
+        public static void GetProjectsByCompany(string companyName)
+        {
+            Console.WriteLine("-----------------------------------");
             using (ApplicationContext db = new ApplicationContext())
             {
-                Employee e = new Employee() { Name = "tom" };
-                Employee e2 = new Employee() { Name = "sophia" };
-                Employee e3 = new Employee() { Name = "adam" };
-                Employee e4 = new Employee() { Name = "lisa" };
 
-                Company c = new Company() { Name = "Google", Employees = new List<Employee>() { e, e2 } };
-                Company c2 = new Company() { Name = "Microsoft", Employees = new List<Employee>() { e3, e4 } };
+                Company? company = db.Companies.FirstOrDefault(c => c.Name == companyName);
+                if (company != null)
+                {
+                    List<Project> projects = new List<Project>();
+                    Console.WriteLine($"Company: {company.Name}");
+                    db.Employees.Where(e => e.Company == company).Load();
+                    foreach (Employee employee in db.Employees)
+                    {
+                        db.Projects.Where(p => p.Employees.Contains(employee)).Load(); //!!!!!
+                        foreach (Project project in employee.Projects)
+                        {
+                            if (!projects.Contains(project))
+                            {
+                                projects.Add(project);
+                            }
+                        }
+                    }
 
-                Project p = new Project() { Name = "P1", Employees = new List<Employee>() { e, e2 } };
-                Project p2 = new Project() { Name = "P2", Employees = new List<Employee>() { e, e3, e4 } };
-                Project p3 = new Project() { Name = "P3", Employees = new List<Employee>() { e2, e4 } };
-                Project p4 = new Project() { Name = "P4", Employees = new List<Employee>() { e3, e4 } };
-                Project p5 = new Project() { Name = "P5", Employees = new List<Employee>() { e, e2, e4 } };
-                db.Employees.AddRange(e, e2, e3, e4);
-                db.Projects.AddRange(p, p2, p3, p4, p5);
-                db.Companies.AddRange(c, c2);
-                db.SaveChanges();
+                    foreach (Project project in db.Projects)
+                    {
+                        Console.WriteLine($"Project {project.Name}");
+                    }
+
+                }
+
             }
-        }   
+        }
     }
     public class Employee
     {

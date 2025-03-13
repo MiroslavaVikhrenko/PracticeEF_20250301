@@ -14,8 +14,8 @@ namespace Task12_20250313
         public DbSet<Project> Projects { get; set; } = null!;
         public ApplicationContext()
         {
-            Database.EnsureDeleted();
-            Database.EnsureCreated();
+            //Database.EnsureDeleted();
+            //Database.EnsureCreated();
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
