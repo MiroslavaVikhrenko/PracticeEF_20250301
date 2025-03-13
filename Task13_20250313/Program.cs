@@ -63,6 +63,8 @@
                 //db.AircraftSpecs.AddRange(aircraftSpecs);
                 //db.Aircrafts.AddRange(aircrafts);
                 //db.SaveChanges();
+
+                GetAircrafts(1, db);
             }
 
 
@@ -77,8 +79,11 @@
         public static void GetAircrafts(int aircraftId, ApplicationContext db)
         {
             Aircraft? aircraft = db.Aircrafts.Where(a => a.Id == aircraftId).FirstOrDefault();
-                
-
+            if (aircraft != null)
+            {
+                Console.WriteLine($"Aircraft {aircraft.Name},\nairport {aircraft.Airport.Name} in {aircraft.Airport.Country.Name},\nspecs: weight {aircraft.AircraftSpecs.Weight}, speed {aircraft.AircraftSpecs.Speed} ");
+            }
+            
         }
     }
 }
