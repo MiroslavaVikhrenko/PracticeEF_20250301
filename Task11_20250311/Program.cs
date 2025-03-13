@@ -47,7 +47,7 @@ namespace Task11_20250311
 
                 ////Удалить пользователя с Id 3
                 ////(автоматически должен удалится профайл пользователя).
-                User? user2 = db.Users.FirstOrDefault(u => u.Id == 3);
+                User? user2 = db.Users.FirstOrDefault(u => u.Id == 5);
                 if (user2 != null)
                 {
                     db.UserSettings.Where(us => us.User == user2).Load();
