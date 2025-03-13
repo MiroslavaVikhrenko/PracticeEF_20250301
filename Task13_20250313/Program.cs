@@ -1,4 +1,6 @@
-﻿namespace Task13_20250313
+﻿using System.Diagnostics.Metrics;
+
+namespace Task13_20250313
 {
     /*
      Написать программу, содержащую многоуровневую структуру данных. 
@@ -65,11 +67,103 @@
                 //db.SaveChanges();
 
                 GetAircrafts(1, db);
+                //AddCountry("Germany", db);
+                //AddAirport("Charles de Gaulle Airport", 4, db);
+                //AddAircraftsAndSpecs("B-367", 800, 800, 5, db);
+                //GetAircraftDetailsByCountry("UK", db); // ???
+                GetAircraftDetailsByAirport(2, db);
             }
 
 
         }
 
+        //Получение полных данных через страну и аэропорт.
+
+        public static void GetAircraftDetailsByAirport(int airportId, ApplicationContext db)
+        {
+            Console.WriteLine("-------------");
+            Airport? airport = db.Airports.Where(a => a.Id == airportId).FirstOrDefault();
+            if (airport!= null)
+            {
+                Console.WriteLine($"Airport: {airport.Name} in {airport.Country.Name}");
+                foreach (Aircraft aircraft in airport.Aircrafts)
+                {
+                    Console.WriteLine($">>> {aircraft.Name} (specs: weight {aircraft.AircraftSpecs.Weight}, speed {aircraft.AircraftSpecs.Speed}");
+                }
+            }
+        }
+
+        public static void GetAircraftDetailsByCountry(string countryName, ApplicationContext db)
+        {
+            Console.WriteLine("-------------");
+            Country? country = db.Countries.Where(c => c.Name == countryName).FirstOrDefault();
+            if (country != null)
+            {
+                Console.WriteLine($"Country: {country.Name}");
+                foreach (Airport airport in db.Airports)
+                {
+                    Console.WriteLine($">>> {airport.Name}");
+                    foreach(Aircraft aircraft in airport.Aircrafts)
+                    {
+                        Console.WriteLine($">>>>>>> {aircraft.Name} (specs: weight {aircraft.AircraftSpecs.Weight}, speed {aircraft.AircraftSpecs.Speed}");
+                    }
+                }
+            }
+        }
+
+        //Добавление самолета и его характеристик.
+
+        public static void AddAircraftsAndSpecs(string aircraftName, int weight, int speed, int airportId, ApplicationContext db)
+        {
+            Aircraft aircraft = new Aircraft()
+            {
+                Name = aircraftName,
+                AircraftSpecs = new AircraftSpecs() { Weight = weight, Speed = speed },
+                AirportId = airportId
+            };
+            db.Aircrafts.Add(aircraft);
+            db.SaveChanges();
+
+            List<Aircraft> aircrafts = db.Aircrafts.ToList();
+            Console.WriteLine("-------------\nAircrafts in the db:");
+            foreach (Aircraft a in aircrafts)
+            {
+                Console.WriteLine($">> {a.Name} (Specs: weight {a.AircraftSpecs.Weight}, speed {a.AircraftSpecs.Speed})");
+            }
+        }
+
+        // Добавление аэропорта. 
+
+        public static void AddAirport(string airportName, int countryId, ApplicationContext db)
+        {
+            Airport airport = new Airport() { Name = airportName, CountryId = countryId};
+            db.Airports.Add(airport);
+            db.SaveChanges();
+
+            List<Airport> airports = db.Airports.ToList();
+            Console.WriteLine("-------------\nAirports in the db:");
+            foreach (Airport a in airports)
+            {
+                Console.WriteLine($">> {a.Name} ({a.Country.Name})");
+            }
+        }
+
+        // Добавление страны.
+
+        public static void AddCountry(string countryName, ApplicationContext db)
+        {
+            Country country = new Country() { Name = countryName };
+            db.Countries.Add(country);
+            db.SaveChanges();
+
+            List<Country> countries = db.Countries.ToList();
+            Console.WriteLine("-------------\nCountries in the db:");
+            foreach(Country c in countries)
+            {
+                Console.WriteLine($">> {c.Name}");
+            }
+        }
+        //Получение полных данных через самолет.
         /*
          Реализовать возможность получение полных данных, а самолете 
     (сам самолет, его характеристики, аэропорт в котором он находится, 
