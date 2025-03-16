@@ -42,33 +42,50 @@ namespace Task14_20250315
 
                 var items = db.MenuItems.ToList();
 
+                //foreach (MenuItem item in items)
+                //{
+                //    if (item.ParentItem == null)
+                //    {
+                //        Console.WriteLine($" -{item.Name}");
+                //        if (item.ChildItems != null)
+                //        {
+                //            foreach (MenuItem child in item.ChildItems)
+                //            {
+                //                Console.WriteLine($" --{child.Name}");
+                //                if (child.ChildItems != null)
+                //                {
+                //                    foreach (MenuItem c in child.ChildItems)
+                //                    {
+                //                        Console.WriteLine($" ---{c.Name}");
+                //                    }
+                //                }
+
+                //            }
+                //        }
+
+                //    }
+                //}
+
                 foreach (MenuItem item in items)
                 {
-                    if (item.ParentItem == null)
-                    {
-                        Console.WriteLine($" -{item.Name}");
-                        if (item.ChildItems != null)
-                        {
-                            foreach (MenuItem child in item.ChildItems)
-                            {
-                                Console.WriteLine($" --{child.Name}");
-                                if (child.ChildItems != null)
-                                {
-                                    foreach (MenuItem c in child.ChildItems)
-                                    {
-                                        Console.WriteLine($" ---{c.Name}");
-                                    }
-                                }
-
-                            }
-                        }
-
-                    }
+                    PrintHierarchicalTree(item, 2);
                 }
             }
         }
-
-        
+        // recursive method
+        public static void PrintHierarchicalTree(MenuItem menuItem, int counter)
+        {
+            
+            foreach (MenuItem child in menuItem.ChildItems)
+            {
+                for (int i = 0; i < counter; i++)
+                {
+                    Console.Write("-");
+                }
+                Console.WriteLine(child.Name);
+                PrintHierarchicalTree(child, counter + 2);
+            }
+        }
     }
     public class MenuItem
     {
