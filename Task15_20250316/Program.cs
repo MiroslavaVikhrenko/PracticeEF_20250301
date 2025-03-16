@@ -1,4 +1,8 @@
-﻿namespace Task15_20250316
+﻿using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using System.Text.RegularExpressions;
+
+namespace Task15_20250316
 {
     /*
      Создайте систему для управления «Событиями» и «Гостями». 
@@ -77,8 +81,162 @@
             //};
             //    db.GuestEvents.AddRange(guestEvents);
             //    db.SaveChanges();
+
+                //AddGuestToEvent(5, 5, Role.Speaker, db);
+                GetGuestsFromEvent(1, db);
+                //UpdateRoleForEvent(1, Role.Speaker, db);
+                GetEventsForGuest(1, db);
+                //DeleteGuestFromEvent(20, db);
+                FindSpeakerEventsForGuest(1, db);
+                FindTopThreeGuests();
             }
 
+        }
+        /* Напишите запрос, который находит Топ 3 гостей, участвовавших в наибольшем количестве событий, 
+    и выводит их общее количество участий и список событий, в которых они участвовали.
+     */
+        public static void FindTopThreeGuests()
+        {            
+            Console.WriteLine("--------\nTop 3 guests:");
+            using (SqlConnection connection = new SqlConnection("Data Source=MIRUAHUA;Initial Catalog=March_EventsForGuests;Integrated Security=True;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False"))
+            {
+                connection.Open();
+                string commandtext = $"""
+                    SELECT TOP 3 
+                        g.Id AS GuestId, 
+                        g.Name AS GuestName, 
+                        COUNT(ge.EventId) AS EventCount
+                    FROM [March_EventsForGuests].[dbo].[GuestEvents] ge
+                    JOIN [March_EventsForGuests].[dbo].[Guests] g 
+                        ON ge.GuestId = g.Id
+                    GROUP BY g.Id, g.Name
+                    ORDER BY EventCount DESC;
+                    """;
+                SqlCommand command = new SqlCommand(commandtext, connection);
+                command.ExecuteNonQuery();
+
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    if (reader.HasRows)
+                    {
+                        string columnName1 = reader.GetName(0);
+                        string columnName2 = reader.GetName(1);
+                        string columnName3 = reader.GetName(2);
+                        Console.WriteLine($"> {columnName1} | {columnName2} | {columnName3}");
+                        while (reader.Read())
+                        {
+                            int guestId = reader.GetInt32(0);
+                            string guestName = reader.GetString(1);
+                            int events = reader.GetInt32(2);
+
+                            Console.WriteLine($">>> {guestId} | {guestName} | {events}");
+                        }
+                    }
+                }
+
+            }
+        }
+
+        // Получение всех событий, на которых гость выступал в роли спикера.
+        public static void FindSpeakerEventsForGuest(int guestId, ApplicationContext db)
+        {
+            Guest? g = db.Guests
+            .Where(g => g.Id == guestId)
+            .Include(g => g.GuestEvents) // Include GuestEvents join table
+            .ThenInclude(ge => ge.Event) // Then include the Events
+            .FirstOrDefault();
+
+            if (g == null)
+            {
+                Console.WriteLine("Guest not found.");
+                return;
+            }
+
+            Console.WriteLine($"-----\nSPEAKER Events for guest {g.Name}:");
+            foreach (GuestEvent? ge in g.GuestEvents)
+            {
+                if (ge.Role == Role.Speaker)
+                {
+                    Console.WriteLine($">>> {ge.Event?.Name} ({ge.Role})");
+                }           
+            }
+        }
+
+        // Удаление гостя с события.
+        public static void DeleteGuestFromEvent(int guesteventid, ApplicationContext db)
+        {
+            GuestEvent? guestEvent = db.GuestEvents.Where(e => e.Id == guesteventid).FirstOrDefault();
+            if (guestEvent == null)
+            {
+                Console.WriteLine("Registration to Event not found.");
+                return;
+            }
+            db.GuestEvents.Remove(guestEvent);
+            db.SaveChanges();
+        }
+
+        // Получение всех событий для конкретного гостя.
+        public static void GetEventsForGuest(int guestId, ApplicationContext db)
+        {
+            Guest? g = db.Guests
+            .Where(g => g.Id == guestId)
+            .Include(g => g.GuestEvents) // Include GuestEvents join table
+            .ThenInclude(ge => ge.Event) // Then include the Events
+            .FirstOrDefault();
+
+            if (g == null)
+            {
+                Console.WriteLine("Guest not found.");
+                return;
+            }
+
+            Console.WriteLine($"-----\nEvents for guest {g.Name}:");
+            foreach (GuestEvent? ge in g.GuestEvents)
+            {
+                Console.WriteLine($">>> {ge.Event?.Name} ({ge.Role})");
+            }
+        }
+
+        // Изменение роли гостя на событии.
+        public static void UpdateRoleForEvent(int guesteventid, Role newrole, ApplicationContext db)
+        {
+            GuestEvent? guestEvent = db.GuestEvents.Where(e => e.Id == guesteventid).FirstOrDefault();
+            if (guestEvent == null)
+            {
+                Console.WriteLine("Registration to Event not found.");
+                return;
+            }
+            guestEvent.Role = newrole;
+            db.SaveChanges();
+        }
+        // Получение списка гостей на конкретном событии.
+        public static void GetGuestsFromEvent(int eventId, ApplicationContext db)
+        {
+            Event? e = db.Events
+            .Where(e => e.Id == eventId)
+            .Include(e => e.GuestEvents) // Include GuestEvents join table
+            .ThenInclude(ge => ge.Guest) // Then include the Guests
+            .FirstOrDefault();
+
+            if (e == null)
+            {
+                Console.WriteLine("Event not found.");
+                return;
+            }
+
+            Console.WriteLine($"-----\nGuests for event {e.Name}:");
+            foreach (GuestEvent? ge in e.GuestEvents)
+            {
+                Console.WriteLine($">>> {ge.Guest?.Name} ({ge.Role})");
+            }
+        }
+
+        // Добавление гостя на событие.
+        public static void AddGuestToEvent(int guestId, int eventId, Role role, ApplicationContext db)
+        {
+            db.GuestEvents.Add(new GuestEvent { GuestId = guestId, EventId = eventId, Role = role });
+            db.SaveChanges();
+            Console.WriteLine($"------------\nGuest {guestId} is added as {role} to event {eventId}");
         }
     }
 }

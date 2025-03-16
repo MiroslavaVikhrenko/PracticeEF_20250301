@@ -10,6 +10,6 @@ namespace Task15_20250316
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public virtual List<Event>? Events { get; set; } = new(); // nav prop
+        public virtual List<GuestEvent> GuestEvents { get; set; } = new(); //nav prop
     }
 }

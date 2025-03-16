@@ -41,13 +41,13 @@ namespace Task15_20250316
 
             modelBuilder.Entity<GuestEvent>()
                 .HasOne(ge => ge.Guest) // Each GuestEvent must have one Guest
-                .WithMany() // A Guest can have multiple GuestEvent entries
+                .WithMany(g => g.GuestEvents) // A Guest can have multiple GuestEvent entries
                 .HasForeignKey(ge => ge.GuestId) // Foreign key to Guest
                 .OnDelete(DeleteBehavior.Cascade); // Deleting a GuestEvent does not delete Guest
 
             modelBuilder.Entity<GuestEvent>()
                 .HasOne(ge => ge.Event) // Each GuestEvent must have one Event
-                .WithMany() // An Event can have multiple GuestEvent entries
+                .WithMany(e => e.GuestEvents)// An Event can have multiple GuestEvent entries
                 .HasForeignKey(ge => ge.EventId) // Foreign key to Event
                 .OnDelete(DeleteBehavior.Cascade); // Deleting a GuestEvent does not delete Event
 
