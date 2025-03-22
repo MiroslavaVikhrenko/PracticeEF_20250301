@@ -218,6 +218,15 @@ namespace Task16_20250322
 
                 //Реализовать получение магазинов определенного города через Свойство Shops, в модели Country.
                 Console.WriteLine("----------------------------------");
+                var storesInCity = db.Stores
+                    .Where(s => s.City.Name == "Red Deer") 
+                    .ToList();
+
+                Console.WriteLine($"Stores in Red Deer:");
+                foreach (var store in storesInCity)
+                {
+                    Console.WriteLine($"- {store.Name} (Address: {store.Address})");
+                }
             }
         }
     }
