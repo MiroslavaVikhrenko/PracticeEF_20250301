@@ -26,49 +26,49 @@ namespace Task16_20250322
         {
             using (ApplicationContext db = new ApplicationContext())
             {
-                //List<City> cities = new List<City>()
-                //{
-                //    new City {Name = "Calgary"},
-                //    new City {Name = "Edmonton"},
-                //    new City {Name = "Red Deer"}
-                //};
-                //db.Cities.AddRange(cities);
-                //db.SaveChanges();
+                List<City> cities = new List<City>()
+                {
+                    new City {Name = "Calgary"},
+                    new City {Name = "Edmonton"},
+                    new City {Name = "Red Deer"}
+                };
+                db.Cities.AddRange(cities);
+                db.SaveChanges();
 
-                //List<Supplier> suppliers = new List<Supplier>()
-                //{
-                //    new Supplier{Name = "Supplier 1"},
-                //    new Supplier{Name = "Supplier 2"},
-                //    new Supplier{Name = "Supplier 3"}
-                //};
-                //db.Suppliers.AddRange(suppliers);
-                //db.SaveChanges();
+                List<Supplier> suppliers = new List<Supplier>()
+                {
+                    new Supplier{Name = "Supplier 1"},
+                    new Supplier{Name = "Supplier 2"},
+                    new Supplier{Name = "Supplier 3"}
+                };
+                db.Suppliers.AddRange(suppliers);
+                db.SaveChanges();
 
-                //List<Store> stores = new List<Store>()
-                //{
-                //    new Store() { Name = "Store 1", CityId = 1, Address = "190-289", Suppliers = new List<Supplier>(){suppliers[0], suppliers[1] } },
-                //    new Store() { Name = "Store 2", CityId = 1, Address = "241-234", Suppliers = new List<Supplier>(){suppliers[1], suppliers[2] } },
-                //    new Store() { Name = "Store 3", CityId = 2, Address = "129-567", Suppliers = new List<Supplier>(){suppliers[0], suppliers[2] } },
-                //    new Store() { Name = "Store 4", CityId = 3, Address = "309-222", Suppliers = new List<Supplier>(){suppliers[0], suppliers[1], suppliers[2] } },
-                //    new Store() { Name = "Store 5", CityId = 3, Address = "987-123", Suppliers = new List<Supplier>(){suppliers[1] } }
-                //};
-                //db.Stores.AddRange(stores);
-                //db.SaveChanges();
+                List<Store> stores = new List<Store>()
+                {
+                    new Store() { Name = "Store 1", CityId = 1, Address = "190-289", Suppliers = new List<Supplier>(){suppliers[0], suppliers[1] } },
+                    new Store() { Name = "Store 2", CityId = 1, Address = "241-234", Suppliers = new List<Supplier>(){suppliers[1], suppliers[2] } },
+                    new Store() { Name = "Store 3", CityId = 2, Address = "129-567", Suppliers = new List<Supplier>(){suppliers[0], suppliers[2] } },
+                    new Store() { Name = "Store 4", CityId = 3, Address = "309-222", Suppliers = new List<Supplier>(){suppliers[0], suppliers[1], suppliers[2] } },
+                    new Store() { Name = "Store 5", CityId = 3, Address = "987-123", Suppliers = new List<Supplier>(){suppliers[1] } }
+                };
+                db.Stores.AddRange(stores);
+                db.SaveChanges();
 
-                //List<Product> products = new List<Product>()
-                //{
-                //    new Product(){Name = "Roses", StoreId = 1},
-                //    new Product(){Name = "Lilies", StoreId = 1},
-                //    new Product(){Name = "Peonies", StoreId = 2},
-                //    new Product(){Name = "Azisai", StoreId = 2},
-                //    new Product(){Name = "Camomiles", StoreId = 3},
-                //    new Product(){Name = "Sakura", StoreId = 4},
-                //    new Product(){Name = "Plums", StoreId = 5},
-                //    new Product(){Name = "Wisteria", StoreId = 5}
+                List<Product> products = new List<Product>()
+                {
+                    new Product(){Name = "Roses", StoreId = 1, Price = 10},
+                    new Product(){Name = "Lilies", StoreId = 1, Price = 5},
+                    new Product(){Name = "Peonies", StoreId = 2, Price = 6},
+                    new Product(){Name = "Azisai", StoreId = 2, Price = 9},
+                    new Product(){Name = "Camomiles", StoreId = 3, Price = 2},
+                    new Product(){Name = "Sakura", StoreId = 4, Price = 11},
+                    new Product(){Name = "Plums", StoreId = 5, Price = 3},
+                    new Product(){Name = "Wisteria", StoreId = 5, Price = 7}
 
-                //};
-                //db.Products.AddRange(products);
-                //db.SaveChanges();
+                };
+                db.Products.AddRange(products);
+                db.SaveChanges();
 
                 // Поиск  товара по определенному магазину (Используя оператор LIKE in SQL).
                 Console.WriteLine("----------------------------------");
@@ -81,6 +81,46 @@ namespace Task16_20250322
                         Console.WriteLine($"---{p.Name}");
                     }
                 }
+
+                // Поиск товара по всем магазинам.(Используя оператор LIKE in SQL).
+                Console.WriteLine("----------------------------------");
+                var retrievedProducts = db.Products.Where(p => EF.Functions.Like(p.Name!, "%Ro%"));
+                foreach (Product p in retrievedProducts)
+                {
+                    Console.WriteLine($"Product {p.Name} is in the following stores:");
+                    Console.WriteLine($"---{p.Store.Name}");
+                }
+
+                // Получение случайного товара из определенного магазина.
+                Console.WriteLine("----------------------------------");
+                var randomProduct = db.Products
+                    .Where(p => p.StoreId == 1)
+                    .OrderBy(p => EF.Functions.Random()) // Random ordering
+                    .FirstOrDefault(); // Get a single random product
+
+                Console.WriteLine($"Random product from {randomProduct.Store.Name}: {randomProduct.Name}");
+
+                //Сортировка цветов: по убыванию и возрастанию их стоимости.
+                Console.WriteLine("----------------------------------");
+                var flowers = db.Products
+                    .OrderBy(p => p.Price) // Sort by price in ascending order
+                    .ToList();
+                Console.WriteLine("Flowers in ASC order by price:");
+                foreach (Product p in flowers)
+                {
+                    Console.WriteLine($"---{p.Name} : {p.Price} CAD");
+                }
+
+                Console.WriteLine("----------------------------------");
+                var flowersDesc = db.Products
+                    .OrderByDescending(p => p.Price) // Sort by price in descending order
+                    .ToList();
+                Console.WriteLine("Flowers in DESC order by price:");
+                foreach (Product p in flowersDesc)
+                {
+                    Console.WriteLine($"---{p.Name} : {p.Price} CAD");
+                }
+
 
                 Console.WriteLine("----------------------------------");
             }

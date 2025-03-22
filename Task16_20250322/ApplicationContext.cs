@@ -15,8 +15,8 @@ namespace Task16_20250322
         public DbSet<Supplier> Suppliers { get; set; } = null!;
         public ApplicationContext()
         {
-            //Database.EnsureDeleted();
-            //Database.EnsureCreated();
+            Database.EnsureDeleted();
+            Database.EnsureCreated();
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
