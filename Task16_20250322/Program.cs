@@ -227,6 +227,42 @@ namespace Task16_20250322
                 {
                     Console.WriteLine($"- {store.Name} (Address: {store.Address})");
                 }
+
+                /*
+                 Получить среднюю стоимость по каждому магазину из разных городов, по типу:
+Киев:
+Магазин "Цветочный веник": Средняя стоимость : 155
+Магазин "Феерия": Средняя стоимость : 172
+Днепр:
+Магазин "Тюльпанчик": Средняя стоимость : 188
+Магазин "У бабушки Гали": Средняя стоимость : 177
+                 */
+                Console.WriteLine("----------------------------------");
+                var cityStoreData = db.Cities
+                .Include(c => c.Stores) 
+                .ThenInclude(s => s.Products) 
+                .Select(c => new
+                {
+                CityName = c.Name,
+                Stores = c.Stores.Select(s => new
+                {
+                   StoreName = s.Name,
+                   AveragePrice = s.Products.Any() // Prevent division by zero
+                       ? s.Products.Average(p => p.Price)
+                       : 0
+                }).ToList()
+                })
+                .ToList();
+
+                foreach (var city in cityStoreData)
+                {
+                    Console.WriteLine($"-{city.CityName}");
+
+                    foreach (var store in city.Stores)
+                    {
+                        Console.WriteLine($" --{store.StoreName}: Average price for product: {store.AveragePrice:F2} CAD");
+                    }
+                }
             }
         }
     }
