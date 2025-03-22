@@ -57,14 +57,14 @@ namespace Task16_20250322
 
                 List<Product> products = new List<Product>()
                 {
-                    new Product(){Name = "Roses", StoreId = 1, Price = 10},
-                    new Product(){Name = "Lilies", StoreId = 1, Price = 5},
-                    new Product(){Name = "Peonies", StoreId = 2, Price = 6},
-                    new Product(){Name = "Azisai", StoreId = 2, Price = 9},
-                    new Product(){Name = "Camomiles", StoreId = 3, Price = 2},
-                    new Product(){Name = "Sakura", StoreId = 4, Price = 11},
-                    new Product(){Name = "Plums", StoreId = 5, Price = 3},
-                    new Product(){Name = "Wisteria", StoreId = 5, Price = 7}
+                    new Product(){Name = "Roses", StoreId = 1, Price = 10, Amount = 2},
+                    new Product(){Name = "Lilies", StoreId = 1, Price = 5, Amount = 3},
+                    new Product(){Name = "Peonies", StoreId = 2, Price = 6, Amount = 4},
+                    new Product(){Name = "Azisai", StoreId = 2, Price = 9, Amount = 7},
+                    new Product(){Name = "Camomiles", StoreId = 3, Price = 2, Amount = 10},
+                    new Product(){Name = "Sakura", StoreId = 4, Price = 11, Amount = 2},
+                    new Product(){Name = "Plums", StoreId = 5, Price = 3, Amount = 10},
+                    new Product(){Name = "Wisteria", StoreId = 5, Price = 7, Amount = 5}
 
                 };
                 db.Products.AddRange(products);
@@ -121,6 +121,18 @@ namespace Task16_20250322
                     Console.WriteLine($"---{p.Name} : {p.Price} CAD");
                 }
 
+                // На основе анонимного типа, сформировать отчет, содержащий: общее количество товара 
+                //в наличии и общую сумму товара для каждого из магазинов в определенном городе(выбор города по ID).
+                Console.WriteLine("----------------------------------");
+                var totalAmountInStore = db.Products
+                    .Where(p => p.StoreId == 1)  // Filter by store
+                    .Sum(p => p.Amount);
+                Console.WriteLine($"Total amount of all products in Store 1: {totalAmountInStore}");
+
+                var totalAmountInCity = db.Products
+                    .Where(p => p.Store.City.Name == "Calgary") // Filter by city via Store
+                    .Sum(p => p.Amount);
+                Console.WriteLine($"Total amount of all products in Calgary: {totalAmountInCity}");
 
                 Console.WriteLine("----------------------------------");
             }
