@@ -1,4 +1,6 @@
-﻿namespace Task16_20250322
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace Task16_20250322
 {
     /*
      Владельцу сети «Цветочных магазинов», 
@@ -40,7 +42,7 @@
                 //    new Supplier{Name = "Supplier 3"}
                 //};
                 //db.Suppliers.AddRange(suppliers);
-                //db.SaveChanges();                
+                //db.SaveChanges();
 
                 //List<Store> stores = new List<Store>()
                 //{
@@ -69,7 +71,18 @@
                 //db.SaveChanges();
 
                 // Поиск  товара по определенному магазину (Используя оператор LIKE in SQL).
+                Console.WriteLine("----------------------------------");
+                var retrievedStores = db.Stores.Where(s => EF.Functions.Like(s.Name!, "%1%"));
+                foreach (Store s in retrievedStores)
+                {
+                    Console.WriteLine($"Products in {s.Name}");
+                    foreach (Product p in s.Products)
+                    {
+                        Console.WriteLine($"---{p.Name}");
+                    }
+                }
 
+                Console.WriteLine("----------------------------------");
             }
         }
     }
