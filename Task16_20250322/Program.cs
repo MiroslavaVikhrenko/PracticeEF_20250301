@@ -77,7 +77,8 @@ namespace Task16_20250322
 
                 List<Product> products = new List<Product>()
                 {
-                    new Product(){Name = "Roses", StoreId = 1, Price = 10, Amount = 2},
+                    new Product(){Name = "Red Roses", StoreId = 1, Price = 10, Amount = 2},
+                    new Product(){Name = "White Roses", StoreId = 1, Price = 10, Amount = 3},
                     new Product(){Name = "Lilies", StoreId = 1, Price = 5, Amount = 3},
                     new Product(){Name = "Peonies", StoreId = 2, Price = 6, Amount = 4},
                     new Product(){Name = "Azisai", StoreId = 2, Price = 9, Amount = 7},
@@ -187,6 +188,16 @@ namespace Task16_20250322
                     }
                 }
 
+                //Вывести товары из определенного магазина, сумма которых превосходит N гривен.
+                Console.WriteLine("----------------------------------");
+                var expensiveProducts = db.Products
+                    .Where(p => p.StoreId == 1 && p.Price > 6) // Filter by store and price
+                    .ToList();
+                Console.WriteLine($"Products in Store 1 with Price > 6:");
+                foreach (var product in expensiveProducts)
+                {
+                    Console.WriteLine($"- {product.Name} (Price: {product.Price:C})");
+                }
             }
         }
     }
