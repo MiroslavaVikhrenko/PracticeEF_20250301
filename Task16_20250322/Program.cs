@@ -198,6 +198,26 @@ namespace Task16_20250322
                 {
                     Console.WriteLine($"- {product.Name} (Price: {product.Price:C})");
                 }
+
+                // Вывести названия магазинов, у которых количество превосходит N единиц.
+                Console.WriteLine("----------------------------------");
+                var storesWithTotalAmount = db.Stores
+                .Select(s => new
+                 {
+                     StoreName = s.Name,
+                     TotalAmount = s.Products.Sum(p => (int?)p.Amount ?? 0) 
+                 })
+                .Where(s => s.TotalAmount > 10) 
+                .ToList();
+
+                Console.WriteLine("Stores where total product stock > 10:");
+                foreach (var store in storesWithTotalAmount)
+                {
+                    Console.WriteLine($"- {store.StoreName} (Total Stock: {store.TotalAmount})");
+                }
+
+                //Реализовать получение магазинов определенного города через Свойство Shops, в модели Country.
+                Console.WriteLine("----------------------------------");
             }
         }
     }
