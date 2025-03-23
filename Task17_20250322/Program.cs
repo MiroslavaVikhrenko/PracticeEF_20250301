@@ -88,7 +88,24 @@ public class Book
 
                 // 2) Получить минимальную цену для книг определенного автора.
                 GetCheapestBookByAuthor(db, "Shusaku Endo");
+
+                // 3) Получить среднюю цену книг в определенном жанре.
+                GetAveragePriceByGenre(db, "Mystery");
             }
+        }
+
+        // 3) Получить среднюю цену книг в определенном жанре.
+        public static void GetAveragePriceByGenre(ApplicationContext db, string genreName)
+        {
+            decimal? averagePrice = db.Books
+                .Where(b => b.Genre.Name == genreName)
+                .Select(b => b.Price)
+                .AsEnumerable() // Fetch data into memory before applying DefaultIfEmpty
+                .DefaultIfEmpty(0) // Prevents exception if no books exist
+                .Average();
+
+            Console.WriteLine("-------------------------------");
+            Console.WriteLine($"\nAverage price for books in {genreName} genre is ${averagePrice:F2}\n");
         }
         // 2) Получить минимальную цену для книг определенного автора.
         public static void GetCheapestBookByAuthor(ApplicationContext db, string authorName)
@@ -102,7 +119,7 @@ public class Book
             Console.WriteLine($"The cheapest book by {authorName}:\n");
             if (cheapestBook != null)
             {
-                Console.WriteLine($" >>> {cheapestBook.Title} by {cheapestBook.Author.Name}, Price: ${cheapestBook.Price}");
+                Console.WriteLine($" >>> {cheapestBook.Title} by {cheapestBook.Author.Name}, Price: ${cheapestBook.Price:F2}");
             }
         }
         // 1) Получить количество книг определенного жанра.
@@ -117,7 +134,7 @@ public class Book
             {
                 foreach (var book in booksByGenre)
                 {
-                    Console.WriteLine($" >>> {book.Title} by {book.Author.Name}, Price: ${book.Price}");
+                    Console.WriteLine($" >>> {book.Title} by {book.Author.Name}, Price: ${book.Price:F2}");
                 }
             }
             else
