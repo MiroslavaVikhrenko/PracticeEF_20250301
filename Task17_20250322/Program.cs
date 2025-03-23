@@ -1,0 +1,88 @@
+﻿namespace Task17_20250322
+{
+    internal class Program
+    {
+        /*
+         Создайте базу данных для управления книгами, авторами и жанрами книг. 
+        Определите 3 класса: «Book», «Author, «Genre». 
+
+Класс «Book», выглядит следующим образом:
+
+public class Book
+{
+    public int Id { get; set; }
+    public string Title { get; set; }
+    public int AuthorId { get; set; }
+    public int GenreId { get; set; }
+    public decimal Price { get; set; }
+    public Author Author { get; set; }
+    public Genre Genre { get; set; }
+}
+
+Настройте связи между классами, используя Fluent Api. 
+Заполните их начальными данными с использованием методов AddRange() - для добавления элементов 
+        и Any() – для проверки наличия.
+ 
+ Выполните следующие 10 запросов LINQ to Entities:
+
+ 1) Получить количество книг определенного жанра.
+ 2) Получить минимальную цену для книг определенного автора.
+ 3) Получить среднюю цену книг в определенном жанре.
+ 4) Получить суммарную стоимость всех книг определенного автора.
+ 5) Выполнить группировку книг по жанрам.
+ 6) Выбрать только названия книг определенного жанра.
+ 7) Выбрать все книги, кроме тех, что относятся к определенному жанру, используя метод Except.
+ 8) Объединить книги от двух авторов, используя метод Union. 
+9) Достать 5-ть самых дорогих книг.
+ 10) Пропустить первые 10 книг и взять следующие 5.
+         */
+        static void Main(string[] args)
+        {
+            using (ApplicationContext db = new ApplicationContext())
+            {
+                List<Genre> genres = new List<Genre>()
+                {
+                    new Genre(){Name = "Mystery"},
+                    new Genre(){Name = "Literary Fiction"},
+                    new Genre(){Name = "Historical Fiction"}
+                };
+                db.Genres.AddRange(genres);
+                db.SaveChanges();
+
+                List<Author> authors = new List<Author>()
+                {
+                    new Author(){Name = "Keigo Higashino"},
+                    new Author(){Name = "Soji Shimada"},
+                    new Author(){Name = "Seicho Matsumoto"},
+                    new Author(){Name = "Haruki Murakami"},
+                    new Author(){Name = "Kenzaburo Oe"},
+                    new Author(){Name = "Shusaku Endo"},
+                    new Author(){Name = "Kazuo Ishiguro"}
+                };
+                db.Authors.AddRange(authors);
+                db.SaveChanges();
+
+                List<Book> books = new List<Book>()
+                {
+                    new Book(){Title = "The Devotion of Suspect X", Genre = genres[0], Author = authors[0], Price = 20},
+                    new Book(){Title = "Malice", Genre = genres[0], Author = authors[0], Price = 45},
+                    new Book(){Title = "The Tokyo Zodiac Murders", Genre = genres[0], Author = authors[1], Price = 30},
+                    new Book(){Title = "Murder in the Crooked House", Genre = genres[0], Author = authors[1], Price = 40},
+                    new Book(){Title = "Inspector Imanishi Investigates", Genre = genres[0], Author = authors[2], Price = 10},
+                    new Book(){Title = "Norwegian Wood", Genre = genres[1], Author = authors[3], Price = 25},
+                    new Book(){Title = "Kafka on the Shore", Genre = genres[1], Author = authors[3], Price = 50},
+                    new Book(){Title = "The Silent Cry", Genre = genres[1], Author = authors[4], Price = 35},
+                    new Book(){Title = "A Personal Matter", Genre = genres[1], Author = authors[4], Price = 15},
+                    new Book(){Title = "The Sea and Poison", Genre = genres[1], Author = authors[5], Price = 60},
+                    new Book(){Title = "Silence", Genre = genres[2], Author = authors[5], Price = 20},
+                    new Book(){Title = "The Samurai", Genre = genres[2], Author = authors[5], Price = 35},
+                    new Book(){Title = "The Honjin Murders", Genre = genres[2], Author = authors[2], Price = 30},
+                    new Book(){Title = "An Artist of the Floating World", Genre = genres[2], Author = authors[6], Price = 20},
+                    new Book(){Title = "The Buried Giant", Genre = genres[2], Author = authors[6], Price = 50}
+                };
+                db.Books.AddRange(books);
+                db.SaveChanges();
+            }
+        }
+    }
+}
