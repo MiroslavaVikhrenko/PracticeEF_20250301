@@ -82,6 +82,29 @@ public class Book
                 };
                 db.Books.AddRange(books);
                 db.SaveChanges();
+
+                // 1) Получить количество книг определенного жанра.
+                GetBooksByGenre(db, "Mystery");
+            }
+        }
+        // 1) Получить количество книг определенного жанра.
+        public static void GetBooksByGenre(ApplicationContext db, string genreName)
+        {
+            var booksByGenre = db.Books
+            .Where(b => b.Genre.Name == genreName)
+            .ToList();
+            Console.WriteLine("-------------------------------");
+            Console.WriteLine($"Books in {genreName} genre:\n");
+            if (booksByGenre.Count > 0)
+            {
+                foreach (var book in booksByGenre)
+                {
+                    Console.WriteLine($" >>> {book.Title} by {book.Author.Name}, Price: ${book.Price}");
+                }
+            }
+            else
+            {
+                Console.WriteLine($"No books in {genreName} found");
             }
         }
     }
