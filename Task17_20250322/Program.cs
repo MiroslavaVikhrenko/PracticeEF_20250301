@@ -85,13 +85,30 @@ public class Book
 
                 // 1) Получить количество книг определенного жанра.
                 GetBooksByGenre(db, "Mystery");
+                GetBooksByGenre(db, "Literary Fiction");
+                GetBooksByGenre(db, "Historical Fiction");
 
                 // 2) Получить минимальную цену для книг определенного автора.
                 GetCheapestBookByAuthor(db, "Shusaku Endo");
 
                 // 3) Получить среднюю цену книг в определенном жанре.
                 GetAveragePriceByGenre(db, "Mystery");
+
+                // 4) Получить суммарную стоимость всех книг определенного автора.
+                GetTotalPriceByAuthor(db, "Soji Shimada");
             }
+        }
+
+        // 4) Получить суммарную стоимость всех книг определенного автора.
+        public static void GetTotalPriceByAuthor(ApplicationContext db, string authorName)
+        {
+            decimal? totalPrice = db.Books
+                .Where(b => b.Author.Name == authorName) // Filter books by author name
+                .Select(b => b.Price) // Select only the price
+                .Sum(); // Get the total sum
+
+            Console.WriteLine("-------------------------------");
+            Console.WriteLine($"\nTotal price for all books by {authorName} is ${totalPrice:F2}\n");
         }
 
         // 3) Получить среднюю цену книг в определенном жанре.
