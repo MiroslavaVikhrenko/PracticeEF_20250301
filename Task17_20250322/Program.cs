@@ -111,6 +111,34 @@ public class Book
 
                 // 9) Достать 5-ть самых дорогих книг.
                 PrintTop5MostExpensiveBooks(db);
+
+                // 10) Пропустить первые 10 книг и взять следующие 5.
+                PrintBooksSkippingFirst10(db);
+            }
+        }
+        // 10) Пропустить первые 10 книг и взять следующие 5.
+        public static void PrintBooksSkippingFirst10(ApplicationContext db)
+        {
+            var books = db.Books
+                .OrderBy(b => b.Id) // Ensure consistent ordering
+                .Skip(10) // Skip the first 10 books
+                .Take(5)  // Take the next 5 books
+                .Select(b => new
+                {
+                    b.Id,
+                    b.Title,
+                    AuthorName = b.Author.Name,
+                    GenreName = b.Genre.Name,
+                    b.Price
+                })
+                .ToList(); // Execute in database
+
+            // Print results
+            Console.WriteLine("-------------------------------");
+            Console.WriteLine("\nBooks (skipping first 10, showing next 5):\n");
+            foreach (var book in books)
+            {
+                Console.WriteLine($" >>> {book.Id}.{book.Title} (Genre: {book.GenreName}, Author: {book.AuthorName}, Price: ${book.Price:F2})");
             }
         }
         // 9) Достать 5-ть самых дорогих книг.
