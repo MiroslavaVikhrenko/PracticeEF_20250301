@@ -105,6 +105,46 @@ public class Book
 
                 // 7) Выбрать все книги, кроме тех, что относятся к определенному жанру, используя метод Except.
                 PrintBooksExceptGenre(db, "Historical Fiction");
+
+                // 8) Объединить книги от двух авторов, используя метод Union.
+                PrintBooksByTwoAuthors(db, "Keigo Higashino", "Kazuo Ishiguro");
+            }
+        }
+
+        // 8) Объединить книги от двух авторов, используя метод Union.
+        public static void PrintBooksByTwoAuthors(ApplicationContext db, string author1, string author2)
+        {
+            // Get books written by the first author
+            var booksByAuthor1 = db.Books
+                .Where(b => b.Author.Name == author1)
+                .Select(b => new
+                {
+                    b.Title,
+                    AuthorName = b.Author.Name,
+                    b.Price,
+                    GenreName = b.Genre.Name
+                });
+
+            // Get books written by the second author
+            var booksByAuthor2 = db.Books
+                .Where(b => b.Author.Name == author2)
+                .Select(b => new
+                {
+                    b.Title,
+                    AuthorName = b.Author.Name,
+                    b.Price,
+                    GenreName = b.Genre.Name
+                });
+
+            // Combine both queries using Union()
+            var books = booksByAuthor1.Union(booksByAuthor2).ToList();
+
+            // Print results
+            Console.WriteLine("-------------------------------");
+            Console.WriteLine($"\nBooks written by '{author1}' and '{author2}':\n");
+            foreach (var book in books)
+            {
+                Console.WriteLine($" >>> {book.Title} (Genre: {book.GenreName}, Author: {book.AuthorName}, Price: ${book.Price:F2})");
             }
         }
         // 7) Выбрать все книги, кроме тех, что относятся к определенному жанру, используя метод Except.
