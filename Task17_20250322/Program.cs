@@ -108,9 +108,34 @@ public class Book
 
                 // 8) Объединить книги от двух авторов, используя метод Union.
                 PrintBooksByTwoAuthors(db, "Keigo Higashino", "Kazuo Ishiguro");
+
+                // 9) Достать 5-ть самых дорогих книг.
+                PrintTop5MostExpensiveBooks(db);
             }
         }
+        // 9) Достать 5-ть самых дорогих книг.
+        public static void PrintTop5MostExpensiveBooks(ApplicationContext db)
+        {
+            var topBooks = db.Books
+                .OrderByDescending(b => b.Price) // Order books by price in descending order
+                .Select(b => new
+                {
+                    b.Title,
+                    AuthorName = b.Author.Name,
+                    GenreName = b.Genre.Name,
+                    b.Price
+                })
+                .Take(5) // Get only the top 5
+                .ToList(); // Execute in database
 
+            // Print results
+            Console.WriteLine("-------------------------------");
+            Console.WriteLine("\nTop 5 Most Expensive Books:\n");
+            foreach (var book in topBooks)
+            {
+                Console.WriteLine($" >>> {book.Title} (Genre: {book.GenreName}, Author: {book.AuthorName}, Price: ${book.Price:F2})");
+            }
+        }
         // 8) Объединить книги от двух авторов, используя метод Union.
         public static void PrintBooksByTwoAuthors(ApplicationContext db, string author1, string author2)
         {
