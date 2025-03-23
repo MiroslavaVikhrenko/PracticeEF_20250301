@@ -102,6 +102,31 @@ public class Book
 
                 // 6) Выбрать только названия книг определенного жанра.
                 PrintBookTitlesByGenre(db, "Historical Fiction");
+
+                // 7) Выбрать все книги, кроме тех, что относятся к определенному жанру, используя метод Except.
+                PrintBooksExceptGenre(db, "Historical Fiction");
+            }
+        }
+        // 7) Выбрать все книги, кроме тех, что относятся к определенному жанру, используя метод Except.
+        public static void PrintBooksExceptGenre(ApplicationContext db, string excludedGenre)
+        {
+            // Get all books
+            var allBooks = db.Books.Select(b => new { b.Title, GenreName = b.Genre.Name }).AsQueryable();
+
+            // Get books of the excluded genre
+            var excludedBooks = db.Books
+                .Where(b => b.Genre.Name == excludedGenre)
+                .Select(b => new { b.Title, GenreName = b.Genre.Name });
+
+            // Use Except() to remove excluded books
+            var booksToDisplay = allBooks.Except(excludedBooks).ToList();
+
+            // Print the result
+            Console.WriteLine("-------------------------------");
+            Console.WriteLine($"\nBooks except those in '{excludedGenre}' genre:\n");
+            foreach (var book in booksToDisplay)
+            {
+                Console.WriteLine($" >>> {book.Title} ({book.GenreName})");
             }
         }
 
