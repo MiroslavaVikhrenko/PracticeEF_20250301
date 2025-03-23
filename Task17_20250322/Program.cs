@@ -85,6 +85,24 @@ public class Book
 
                 // 1) Получить количество книг определенного жанра.
                 GetBooksByGenre(db, "Mystery");
+
+                // 2) Получить минимальную цену для книг определенного автора.
+                GetCheapestBookByAuthor(db, "Shusaku Endo");
+            }
+        }
+        // 2) Получить минимальную цену для книг определенного автора.
+        public static void GetCheapestBookByAuthor(ApplicationContext db, string authorName)
+        {
+            Book? cheapestBook = db.Books
+                .Where(b => b.Author.Name == authorName)
+                .OrderBy(b => b.Price) // Sort books by price (ascending)
+                .FirstOrDefault(); // Get the first book (cheapest) or null if no books exist
+
+            Console.WriteLine("-------------------------------");
+            Console.WriteLine($"The cheapest book by {authorName}:\n");
+            if (cheapestBook != null)
+            {
+                Console.WriteLine($" >>> {cheapestBook.Title} by {cheapestBook.Author.Name}, Price: ${cheapestBook.Price}");
             }
         }
         // 1) Получить количество книг определенного жанра.
