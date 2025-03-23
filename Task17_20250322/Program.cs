@@ -99,6 +99,25 @@ public class Book
 
                 // 5) Выполнить группировку книг по жанрам.
                 PrintBooksGroupedByGenre(db);
+
+                // 6) Выбрать только названия книг определенного жанра.
+                PrintBookTitlesByGenre(db, "Historical Fiction");
+            }
+        }
+
+        // 6) Выбрать только названия книг определенного жанра.
+        public static void PrintBookTitlesByGenre(ApplicationContext db, string genreName)
+        {
+            var bookTitles = db.Books
+                .Where(b => b.Genre.Name == genreName) // Filter books by genre name
+                .Select(b => b.Title) // Select only the title
+                .ToList(); // Execute query in database
+
+            Console.WriteLine("-------------------------------");
+            Console.WriteLine($"\nBooks in the '{genreName}' genre:\n");
+            foreach (var title in bookTitles)
+            {
+                Console.WriteLine($" >>> {title}");
             }
         }
 
