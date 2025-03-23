@@ -96,6 +96,34 @@ public class Book
 
                 // 4) Получить суммарную стоимость всех книг определенного автора.
                 GetTotalPriceByAuthor(db, "Soji Shimada");
+
+                // 5) Выполнить группировку книг по жанрам.
+                PrintBooksGroupedByGenre(db);
+            }
+        }
+
+        // 5) Выполнить группировку книг по жанрам.
+        public static void PrintBooksGroupedByGenre(ApplicationContext db)
+        {
+            var groupedBooks = db.Books
+                .GroupBy(b => b.Genre.Name) // Group books by genre name
+                .Select(g => new
+                {
+                    Genre = g.Key, // Genre name
+                    Books = g.Select(b => new { b.Title, b.Author.Name, b.Price }) // Select relevant book details
+                })
+                .ToList(); // Execute in database
+            Console.WriteLine("-------------------------------");
+            Console.WriteLine("\nBooks grouped by genres\n");
+            // Print grouped books
+            foreach (var group in groupedBooks)
+            {
+                Console.WriteLine($"Genre: {group.Genre}");
+                foreach (var book in group.Books)
+                {
+                    Console.WriteLine($" >>> {book.Title} by {book.Name}, Price: ${book.Price:F2}");
+                }
+                Console.WriteLine(); 
             }
         }
 
