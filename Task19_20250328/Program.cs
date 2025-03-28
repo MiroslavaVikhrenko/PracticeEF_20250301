@@ -89,6 +89,47 @@ Enrollment (Запись): представляет собой связь меж
                 };
                 db.Enrollments.AddRange(enrollments);
                 db.SaveChanges();
+
+                // 1) Список студентов и количество курсов, на которые они записаны.
+                PrintStudentsWithCourses(db);
+            }
+        }
+
+        // 1) Список студентов и количество курсов, на которые они записаны.
+        public static void PrintStudentsWithCourses(ApplicationContext db)
+        {
+            var students = db.Students
+                .Select(s => new
+                {
+                    s.Id,
+                    s.Name,
+                    Courses = s.Enrollments.Select(e => new
+                    {
+                        e.Course.Title,
+                        e.Grade
+                    }).ToList()
+                })
+                .ToList();
+            Console.WriteLine("\n----------------------------------\n");
+            foreach (var student in students)
+            {
+                Console.WriteLine($"Student ID: {student.Id}, Name: {student.Name}");
+                Console.WriteLine($"Total Courses Enrolled: {student.Courses.Count}");
+
+                if (student.Courses.Any())
+                {
+                    Console.WriteLine("Courses & Grades:");
+                    foreach (var course in student.Courses)
+                    {
+                        Console.WriteLine($" - {course.Title}, Grade: {course.Grade}");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("No enrolled courses.");
+                }
+
+                Console.WriteLine("\n-----\n"); 
             }
         }
     }
