@@ -137,9 +137,46 @@ namespace Task18_20250328
 
                 // 7) Получить самого молодого студента.
                 GetYoungestStudent(db);
+
+                // 8) Получить количество курсов, на которых учится студент с определенным Id.
+                GetStudentCoursesDetails(db, 3);
             }
         }
+        // 8) Получить количество курсов, на которых учится студент с определенным Id.
+        public static void GetStudentCoursesDetails(ApplicationContext db, int studentId)
+        {
+            var studentDetails = db.Students
+                .Where(s => s.Id == studentId)
+                .Select(s => new
+                {
+                    FullName = s.Name + " " + s.FamilyName,
+                    TotalCourses = s.Enrollments.Count(),
+                    Courses = s.Enrollments.Select(e => new
+                    {
+                        CourseName = e.Course.Name,
+                        CourseDescription = e.Course.Description,
+                        EnrollmentDate = e.EnrollmentDate
+                    }).ToList()
+                })
+                .FirstOrDefault(); // Get student or null if not found
 
+            if (studentDetails != null)
+            {
+                Console.WriteLine("\n----------------------------------\n");
+                Console.WriteLine($"Student: {studentDetails.FullName}");
+                Console.WriteLine($"Total Number of Courses Enrolled: {studentDetails.TotalCourses}");
+                Console.WriteLine("Courses enrolled:");
+
+                foreach (var course in studentDetails.Courses)
+                {
+                    Console.WriteLine($"- {course.CourseName}: {course.CourseDescription}, Enrolled on: {course.EnrollmentDate.ToShortDateString()}");
+                }
+            }
+            else
+            {
+                Console.WriteLine($"Student with ID {studentId} not found.");
+            }
+        }
         // 7) Получить самого молодого студента.
         public static void GetYoungestStudent(ApplicationContext db)
         {
