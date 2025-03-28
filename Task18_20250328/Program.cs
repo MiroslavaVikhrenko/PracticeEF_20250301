@@ -114,6 +114,44 @@
                 };
                 db.Enrollments.AddRange(enrollments);
                 db.SaveChanges();
+
+                // 1) Получить список студентов, зачисленных на определенный курс.
+                GetAllStudentsByCourse(1, db);
+            }
+        }
+
+        // 1) Получить список студентов, зачисленных на определенный курс.
+        public static void GetAllStudentsByCourse(int courseId, ApplicationContext db)
+        {
+            // Fetch the course details
+            var course = db.Courses.FirstOrDefault(c => c.Id == courseId);
+
+            if (course == null)
+            {
+                Console.WriteLine($"Course with ID {courseId} not found.");
+                return;
+            }
+
+            // Fetch students enrolled in the course
+            var students = db.Enrollments
+                             .Where(e => e.CourseId == courseId)
+                             .Select(e => e.Student)
+                             .ToList();
+
+            // Print results
+            Console.WriteLine($"Course: {course.Name} ({course.Description})");
+
+            if (students.Any())
+            {
+                Console.WriteLine("Enrolled Students:");
+                foreach (var student in students)
+                {
+                    Console.WriteLine($"- {student.Name} {student.FamilyName}, Born on: {student.BirthDay.ToShortDateString()}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("No students are enrolled in this course.");
             }
         }
     }
