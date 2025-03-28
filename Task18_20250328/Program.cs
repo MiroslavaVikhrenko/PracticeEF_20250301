@@ -146,6 +146,37 @@ namespace Task18_20250328
 
                 // 10) Сгруппировать студентов по возрасту.
                 GetStudentsGroupedByAge(db);
+
+                // 11) Получить список студентов, отсортированных по фамилии в алфавитном порядке.
+                GetStudentsSortedByFamilyName(db);
+            }
+        }
+        // 11) Получить список студентов, отсортированных по фамилии в алфавитном порядке.
+        public static void GetStudentsSortedByFamilyName(ApplicationContext db)
+        {
+            var students = db.Students
+                .OrderBy(s => s.FamilyName)
+                .ThenBy(s => s.Name) // Secondary sorting by Name if FamilyNames are the same
+                .Select(s => new
+                {
+                    s.FamilyName,
+                    s.Name,
+                    s.Id
+                })
+                .ToList(); // Executes query in database
+
+            if (students.Any())
+            {
+                Console.WriteLine("\n----------------------------------\n");
+                Console.WriteLine("Students sorted by Family Name:");
+                foreach (var student in students)
+                {
+                    Console.WriteLine($"{student.FamilyName}, {student.Name} (ID: {student.Id})");
+                }
+            }
+            else
+            {
+                Console.WriteLine("No students found in the database.");
             }
         }
         // 10) Сгруппировать студентов по возрасту.
