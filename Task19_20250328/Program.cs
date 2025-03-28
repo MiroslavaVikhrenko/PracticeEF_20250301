@@ -1,0 +1,95 @@
+﻿namespace Task19_20250328
+{
+    /*
+     У вас есть база данных для системы управления университетом. Существуют следующие сущности: 
+
+Student (Студент): содержит данные о студентах, включая Id, Name, DateOfBirth (дата рождения) и список курсов, на которые студент записан. 
+Course (Курс): содержит данные о курсах, такие как Id, Title, Credits и список студентов, записанных на курс. 
+Enrollment (Запись): представляет собой связь между студентом и курсом, содержит StudentId, CourseId, Grade (оценка студента за курс).
+
+Заполните таблицы данными выполните следующие запросы:
+
+1) Список студентов и количество курсов, на которые они записаны.
+2) Курсы, на которые записано больше 10 студентов.
+3) Средняя оценка студента по всем курсам.
+4) Студенты, которые не записаны ни на один курс.
+5) Лучший студент по конкретному курсу (на основе оценки).
+6) Количество курсов, на которые записаны студенты старше 30 лет.
+7) Курсы с максимальной и минимальной средней оценкой.
+     */
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            using (ApplicationContext db = new ApplicationContext())
+            {
+                List<Student> students = new List<Student>()
+                {
+                    new Student(){Name = "Taro", DateOfBirth = new DateTime(2000,04,30)},
+                    new Student(){Name = "Keisuke", DateOfBirth = new DateTime(2001,01,20)},
+                    new Student(){Name = "Satoshi", DateOfBirth = new DateTime(1999,02,10)},
+                    new Student(){Name = "Hiroo", DateOfBirth = new DateTime(1998,03,12)},
+                    new Student(){Name = "Hiroshi", DateOfBirth = new DateTime(2003,05,11)},
+                    new Student(){Name = "Takeshi", DateOfBirth = new DateTime(2002,06,27)},
+                    new Student(){Name = "Kenji", DateOfBirth = new DateTime(2004,07,19)},
+                    new Student(){Name = "Midori", DateOfBirth = new DateTime(2005,08,25)},
+                    new Student(){Name = "Yuka", DateOfBirth = new DateTime(2006,09,21)},
+                    new Student(){Name = "Akiko", DateOfBirth = new DateTime(2005,10,15)}
+                };
+                db.Students.AddRange(students);
+                db.SaveChanges();
+
+                List<Course> courses = new List<Course>()
+                {
+                    new Course(){Title = "C#"},
+                    new Course(){Title = "C++"},
+                    new Course(){Title = "Maths"},
+                    new Course(){Title = "Physics"},
+                    new Course(){Title = "English"},
+                    new Course(){Title = "Presentation"},
+                    new Course(){Title = "Japanese"},
+                    new Course(){Title = "Databases"},
+                    new Course(){Title = "Design patterns"},
+                    new Course(){Title = "Coding"}
+                };
+
+                db.Courses.AddRange(courses);
+                db.SaveChanges();
+
+                List<Enrollment> enrollments = new List<Enrollment>()
+                {
+                    new Enrollment(){StudentId = 1, CourseId = 1, Grade = 85},
+                    new Enrollment(){StudentId = 1, CourseId = 3, Grade = 72},
+                    new Enrollment(){StudentId = 1, CourseId = 10, Grade = 91},
+                    new Enrollment(){StudentId = 2, CourseId = 2, Grade = 64},
+                    new Enrollment(){StudentId = 2, CourseId = 6, Grade = 99},
+                    new Enrollment(){StudentId = 2, CourseId = 9, Grade = 77},
+                    new Enrollment(){StudentId = 3, CourseId = 3, Grade = 88},
+                    new Enrollment(){StudentId = 3, CourseId = 7, Grade = 93},
+                    new Enrollment(){StudentId = 3, CourseId = 9, Grade = 69},
+                    new Enrollment(){StudentId = 4, CourseId = 4, Grade = 90},
+                    new Enrollment(){StudentId = 4, CourseId = 5, Grade = 78},
+                    new Enrollment(){StudentId = 4, CourseId = 10, Grade = 82},
+                    new Enrollment(){StudentId = 5, CourseId = 2, Grade = 95},
+                    new Enrollment(){StudentId = 6, CourseId = 1, Grade = 87},
+                    new Enrollment(){StudentId = 6, CourseId = 6, Grade = 66},
+                    new Enrollment(){StudentId = 6, CourseId = 10, Grade = 80},
+                    new Enrollment(){StudentId = 7, CourseId = 3, Grade = 74},
+                    new Enrollment(){StudentId = 7, CourseId = 5, Grade = 99},
+                    new Enrollment(){StudentId = 8, CourseId = 1, Grade = 92},
+                    new Enrollment(){StudentId = 8, CourseId = 2, Grade = 63},
+                    new Enrollment(){StudentId = 8, CourseId = 3, Grade = 89},
+                    new Enrollment(){StudentId = 9, CourseId = 1, Grade = 79},
+                    new Enrollment(){StudentId = 9, CourseId = 4, Grade = 94},
+                    new Enrollment(){StudentId = 9, CourseId = 8, Grade = 67},
+                    new Enrollment(){StudentId = 10, CourseId = 2, Grade = 76},
+                    new Enrollment(){StudentId = 10, CourseId = 3, Grade = 85},
+                    new Enrollment(){StudentId = 10, CourseId = 7, Grade = 98},
+                    new Enrollment(){StudentId = 10, CourseId = 8, Grade = 81}
+                };
+                db.Enrollments.AddRange(enrollments);
+                db.SaveChanges();
+            }
+        }
+    }
+}
