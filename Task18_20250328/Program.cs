@@ -152,6 +152,47 @@ namespace Task18_20250328
 
                 // 12) Получить список студентов вместе с информацией о зачислениях на курсы.
                 GetAllStudentsWithEnrollments(db);
+
+                // 13) Получить список студентов, не зачисленных на определенный курс.
+                GetAllCoursesWithNonEnrolledStudents(db, 1);
+            }
+        }
+        // 13) Получить список студентов, не зачисленных на определенный курс.
+        public static void GetAllCoursesWithNonEnrolledStudents(ApplicationContext db, int courseId)
+        {
+            var course = db.Courses
+        .Where(c => c.Id == courseId)
+        .Select(c => new
+        {
+            c.Id,
+            c.Name,
+            c.Description,
+            NonEnrolledStudents = db.Students
+                .Where(s => !s.Enrollments.Any(e => e.CourseId == courseId))
+                .Select(s => s.Name + " " + s.FamilyName)
+                .ToList()
+        })
+        .FirstOrDefault(); // Get only one course or null if not found
+
+            if (course == null)
+            {
+                Console.WriteLine($"Course with ID {courseId} not found.");
+                return;
+            }
+            Console.WriteLine("\n----------------------------------\n");
+            Console.WriteLine($"\nCourse ID: {course.Id}, Name: {course.Name}, Description: {course.Description}");
+
+            if (course.NonEnrolledStudents.Any())
+            {
+                Console.WriteLine("  Students NOT enrolled in this course:");
+                foreach (var student in course.NonEnrolledStudents)
+                {
+                    Console.WriteLine($"  - {student}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("  All students are enrolled in this course.");
             }
         }
         // 12) Получить список студентов вместе с информацией о зачислениях на курсы.
