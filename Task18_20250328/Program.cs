@@ -143,6 +143,41 @@ namespace Task18_20250328
 
                 // 9) Получить список имен всех студентов.
                 GetAllStudents(db);
+
+                // 10) Сгруппировать студентов по возрасту.
+                GetStudentsGroupedByAge(db);
+            }
+        }
+        // 10) Сгруппировать студентов по возрасту.
+        public static void GetStudentsGroupedByAge(ApplicationContext db)
+        {
+            var studentsGroupedByAge = db.Students
+                .Select(s => new
+                {
+                    FullName = s.Name + " " + s.FamilyName,
+                    Age = DateTime.Now.Year - s.BirthDay.Year -
+                          (DateTime.Now.DayOfYear < s.BirthDay.DayOfYear ? 1 : 0) // Adjust for birthdays not yet reached
+                })
+                .GroupBy(s => s.Age)
+                .OrderBy(g => g.Key) // Sorting by age ascending
+                .ToList();
+
+            if (studentsGroupedByAge.Any())
+            {
+                Console.WriteLine("\n----------------------------------\n");
+                Console.WriteLine("Students Grouped by Age:");
+                foreach (var group in studentsGroupedByAge)
+                {
+                    Console.WriteLine($"\nAge: {group.Key}");
+                    foreach (var student in group)
+                    {
+                        Console.WriteLine($"- {student.FullName}");
+                    }
+                }
+            }
+            else
+            {
+                Console.WriteLine("No students found in the database.");
             }
         }
         // 9) Получить список имен всех студентов.
