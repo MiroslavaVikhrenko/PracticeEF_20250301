@@ -111,7 +111,36 @@ Enrollment (Запись): представляет собой связь меж
 
                 // 6) Количество курсов, на которые записаны студенты старше 30 лет.
                 PrintCoursesWithOlderStudents(db);
+
+                // 7) Курсы с максимальной и минимальной средней оценкой.
+                PrintCoursesWithMaxMinAverageGrade(db);
             }
+        }
+        // 7) Курсы с максимальной и минимальной средней оценкой.
+        public static void PrintCoursesWithMaxMinAverageGrade(ApplicationContext db)
+        {
+            var coursesWithGrades = db.Courses
+                .Where(c => c.Enrollments.Any()) // Only courses with enrollments
+                .Select(c => new
+                {
+                    c.Title,
+                    AverageGrade = c.Enrollments.Average(e => e.Grade) // Calculate average grade
+                })
+                .ToList();
+
+            if (!coursesWithGrades.Any())
+            {
+                Console.WriteLine("No courses with enrolled students found.");
+                return;
+            }
+
+            var courseWithHighestAvg = coursesWithGrades.OrderByDescending(c => c.AverageGrade).First();
+            var courseWithLowestAvg = coursesWithGrades.OrderBy(c => c.AverageGrade).First();
+
+            Console.WriteLine("\n----------------------------------\n");
+
+            Console.WriteLine($"Course with highest average grade is: {courseWithHighestAvg.Title}, Average Grade: {courseWithHighestAvg.AverageGrade:F2}");
+            Console.WriteLine($"Course with lowest average grade is: {courseWithLowestAvg.Title}, Average Grade: {courseWithLowestAvg.AverageGrade:F2}");
         }
         // 6) Количество курсов, на которые записаны студенты старше 30 лет.
         public static void PrintCoursesWithOlderStudents(ApplicationContext db)
