@@ -131,9 +131,33 @@ namespace Task18_20250328
 
                 // 5) Получить список студентов, старше 25 лет.
                 GetStudentsOlderThan21(db);
+
+                // 6) Получить средний возраст всех студентов.
+                GetAverageStudentAge(db);
             }
         }
+        // 6) Получить средний возраст всех студентов.
+        public static void GetAverageStudentAge(ApplicationContext db)
+        {
+            // Get today's date
+            DateTime today = DateTime.Today;
 
+            // Calculate average age
+            double? averageAge = db.Students
+                                   .Select(s => EF.Functions.DateDiffYear(s.BirthDay, today)) // Calculate age using SQL
+                                   .Average();
+
+            // Print result
+            Console.WriteLine("\n----------------------------------\n");
+            if (averageAge.HasValue)
+            {
+                Console.WriteLine($"The average age of all students is: {Math.Round(averageAge.Value, 2)} years");
+            }
+            else
+            {
+                Console.WriteLine("No students found in the database.");
+            }
+        }
         // 5) Получить список студентов, старше 25 лет.
         public static void GetStudentsOlderThan21(ApplicationContext db)
         {
