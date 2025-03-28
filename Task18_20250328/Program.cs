@@ -99,6 +99,7 @@ namespace Task18_20250328
                     new Enrollment(){StudentId = 4, CourseId = 5},
                     new Enrollment(){StudentId = 4, CourseId = 10},
                     new Enrollment(){StudentId = 5, CourseId = 2},
+                    new Enrollment(){StudentId = 6, CourseId = 1},
                     new Enrollment(){StudentId = 6, CourseId = 6},
                     new Enrollment(){StudentId = 6, CourseId = 10},
                     new Enrollment(){StudentId = 7, CourseId = 3},
@@ -155,6 +156,48 @@ namespace Task18_20250328
 
                 // 13) Получить список студентов, не зачисленных на определенный курс.
                 GetAllCoursesWithNonEnrolledStudents(db, 1);
+
+                // 14) Получить список студентов, зачисленных одновременно на два определенных курса.
+                GetStudentsEnrolledInTwoCourses(db, 1, 10);
+            }
+        }
+        // 14) Получить список студентов, зачисленных одновременно на два определенных курса.
+        public static void GetStudentsEnrolledInTwoCourses(ApplicationContext db, int courseId1, int courseId2)
+        {
+            var courses = db.Courses
+                .Where(c => c.Id == courseId1 || c.Id == courseId2)
+                .Select(c => new { c.Id, c.Name, c.Description })
+                .ToList();
+
+            if (courses.Count < 2)
+            {
+                Console.WriteLine("One or both courses not found.");
+                return;
+            }
+
+            var studentsEnrolledInBoth = db.Students
+                .Where(s => s.Enrollments.Any(e => e.CourseId == courseId1) &&
+                            s.Enrollments.Any(e => e.CourseId == courseId2))
+                .Select(s => s.Name + " " + s.FamilyName)
+                .ToList();
+            Console.WriteLine("\n----------------------------------\n");
+            Console.WriteLine("\nCourses:");
+            foreach (var course in courses)
+            {
+                Console.WriteLine($"  - {course.Name} ({course.Description})");
+            }
+
+            Console.WriteLine("\nStudents enrolled in both courses:");
+            if (studentsEnrolledInBoth.Any())
+            {
+                foreach (var student in studentsEnrolledInBoth)
+                {
+                    Console.WriteLine($"  - {student}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("  No students are enrolled in both courses.");
             }
         }
         // 13) Получить список студентов, не зачисленных на определенный курс.
