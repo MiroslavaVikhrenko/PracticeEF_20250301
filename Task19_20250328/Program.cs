@@ -103,6 +103,46 @@ Enrollment (Запись): представляет собой связь меж
 
                 // 4) Студенты, которые не записаны ни на один курс.
                 PrintStudentsWithoutCourses(db);
+
+                // 5) Лучший студент по конкретному курсу (на основе оценки).
+                PrintTopStudentInCourse(db, 1);
+            }
+        }
+        // 5) Лучший студент по конкретному курсу (на основе оценки).
+        public static void PrintTopStudentInCourse(ApplicationContext db, int courseId)
+        {
+            var course = db.Courses
+                .Where(c => c.Id == courseId)
+                .Select(c => new
+                {
+                    c.Title,
+                    TopStudent = c.Enrollments
+                        .OrderByDescending(e => e.Grade) // Sort by highest grade
+                        .Select(e => new
+                        {
+                            e.Student.Name,
+                            e.Grade
+                        })
+                        .FirstOrDefault() // Take the top student
+                })
+                .FirstOrDefault();
+
+            if (course == null)
+            {
+                Console.WriteLine("Course not found.");
+                return;
+            }
+            Console.WriteLine("\n----------------------------------\n");
+            Console.WriteLine($"Course: {course.Title}");
+
+            if (course.TopStudent != null)
+            {
+                Console.WriteLine("Top Student:");
+                Console.WriteLine($" - {course.TopStudent.Name}, Grade: {course.TopStudent.Grade}");
+            }
+            else
+            {
+                Console.WriteLine("No students are enrolled in this course.");
             }
         }
         // 4) Студенты, которые не записаны ни на один курс.
