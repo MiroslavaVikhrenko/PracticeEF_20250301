@@ -134,8 +134,42 @@ namespace Task18_20250328
 
                 // 6) Получить средний возраст всех студентов.
                 GetAverageStudentAge(db);
+
+                // 7) Получить самого молодого студента.
+                GetYoungestStudent(db);
             }
         }
+
+        // 7) Получить самого молодого студента.
+        public static void GetYoungestStudent(ApplicationContext db)
+        {
+            // Get today's date
+            DateTime today = DateTime.Today;
+
+            // Find the youngest student
+            var youngestStudent = db.Students
+                                    .OrderByDescending(s => s.BirthDay) // Sort by BirthDay (youngest first)
+                                    .Select(s => new
+                                    {
+                                        FullName = s.Name + " " + s.FamilyName,
+                                        BirthDate = s.BirthDay,
+                                        Age = EF.Functions.DateDiffYear(s.BirthDay, today) // Calculate age
+                                    })
+                                    .FirstOrDefault(); // Get the first (youngest) student
+
+            // Print result
+            Console.WriteLine("\n----------------------------------\n");
+            if (youngestStudent != null)
+            {
+                Console.WriteLine("The youngest student:");
+                Console.WriteLine($"- {youngestStudent.FullName}, Age: {youngestStudent.Age}, Birthdate: {youngestStudent.BirthDate.ToShortDateString()}");
+            }
+            else
+            {
+                Console.WriteLine("No students found in the database.");
+            }
+        }
+
         // 6) Получить средний возраст всех студентов.
         public static void GetAverageStudentAge(ApplicationContext db)
         {
