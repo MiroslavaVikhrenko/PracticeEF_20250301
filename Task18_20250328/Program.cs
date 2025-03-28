@@ -140,6 +140,34 @@ namespace Task18_20250328
 
                 // 8) Получить количество курсов, на которых учится студент с определенным Id.
                 GetStudentCoursesDetails(db, 3);
+
+                // 9) Получить список имен всех студентов.
+                GetAllStudents(db);
+            }
+        }
+        // 9) Получить список имен всех студентов.
+        public static void GetAllStudents(ApplicationContext db)
+        {
+            var students = db.Students
+                .Select(s => new
+                {
+                    s.Id,
+                    FullName = s.Name + " " + s.FamilyName
+                })
+                .ToList(); // Executes the query and loads the data into memory
+
+            if (students.Any())
+            {
+                Console.WriteLine("\n----------------------------------\n");
+                Console.WriteLine("List of Students:");
+                foreach (var student in students)
+                {
+                    Console.WriteLine($"ID: {student.Id}, Name: {student.FullName}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("No students found in the database.");
             }
         }
         // 8) Получить количество курсов, на которых учится студент с определенным Id.
