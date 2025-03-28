@@ -152,15 +152,16 @@ namespace Task18_20250328
         public static void GetStudentsGroupedByAge(ApplicationContext db)
         {
             var studentsGroupedByAge = db.Students
-                .Select(s => new
-                {
-                    FullName = s.Name + " " + s.FamilyName,
-                    Age = DateTime.Now.Year - s.BirthDay.Year -
-                          (DateTime.Now.DayOfYear < s.BirthDay.DayOfYear ? 1 : 0) // Adjust for birthdays not yet reached
-                })
-                .GroupBy(s => s.Age)
-                .OrderBy(g => g.Key) // Sorting by age ascending
-                .ToList();
+        .AsEnumerable() // Ensures in-memory evaluation
+        .Select(s => new
+        {
+            FullName = s.Name + " " + s.FamilyName,
+            Age = DateTime.Today.Year - s.BirthDay.Year -
+                  (DateTime.Today < s.BirthDay.AddYears(DateTime.Today.Year - s.BirthDay.Year) ? 1 : 0)
+        })
+        .GroupBy(s => s.Age)
+        .OrderBy(g => g.Key)
+        .ToList();
 
             if (studentsGroupedByAge.Any())
             {
