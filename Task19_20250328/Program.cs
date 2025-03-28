@@ -95,6 +95,42 @@ Enrollment (Запись): представляет собой связь меж
 
                 // 2) Курсы, на которые записано больше 10 студентов.
                 PrintPopularCourses(db);
+
+                // 3) Средняя оценка студента по всем курсам.
+                PrintStudentsWithGrades(db);
+            }
+        }
+        // 3) Средняя оценка студента по всем курсам.
+        public static void PrintStudentsWithGrades(ApplicationContext db)
+        {
+            var students = db.Students
+                .Where(s => s.Enrollments.Any()) // Only students with enrollments
+                .Select(s => new
+                {
+                    s.Name,
+                    AverageGrade = s.Enrollments.Average(e => e.Grade),
+                    Courses = s.Enrollments.Select(e => new
+                    {
+                        e.Course.Title,
+                        e.Grade
+                    }).ToList()
+                })
+                .ToList();
+
+            Console.WriteLine("\n----------------------------------\n");
+
+            foreach (var student in students)
+            {
+                Console.WriteLine($"Student: {student.Name}");
+                Console.WriteLine($"Average Grade: {student.AverageGrade:F2}");
+
+                Console.WriteLine("Enrolled Courses:");
+                foreach (var course in student.Courses)
+                {
+                    Console.WriteLine($" - {course.Title}, Grade: {course.Grade}");
+                }
+
+                Console.WriteLine("\n-----\n");
             }
         }
 
