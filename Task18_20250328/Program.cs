@@ -123,6 +123,54 @@
 
                 // 3) Получить список курсов, на которых учит определенный преподаватель, вместе с именами студентов, зачисленных на каждый курс.
                 GetAllCoursesWithStudentsByInstructor(2, db);
+
+                // 4) Получить список курсов, на которые зачислено более 5 студентов.
+                GetCoursesWithMoreThanThreeStudents(db);
+            }
+        }
+
+        // 4) Получить список курсов, на которые зачислено более 5 студентов.
+        public static void GetCoursesWithMoreThanThreeStudents(ApplicationContext db)
+        {
+            // Query courses with more than 3 students enrolled
+            var coursesWithStudents = db.Courses
+                                        .Where(c => c.Enrollments.Count > 3) // Filter courses with more than 3 students
+                                        .Select(c => new
+                                        {
+                                            CourseName = c.Name,
+                                            CourseDescription = c.Description,
+                                            Enrollments = c.Enrollments.Select(e => new
+                                            {
+                                                StudentName = e.Student.Name,
+                                                StudentFamilyName = e.Student.FamilyName,
+                                                EnrollmentDate = e.EnrollmentDate
+                                            }).ToList()
+                                        })
+                                        .ToList();
+
+            // Print results
+            Console.WriteLine("\n----------------------------------\n");
+            if (coursesWithStudents.Any())
+            {
+                Console.WriteLine("Courses with more than 3 students enrolled:");
+
+                foreach (var course in coursesWithStudents)
+                {
+                    Console.WriteLine($"- {course.CourseName} ({course.CourseDescription})");
+
+                    if (course.Enrollments.Any())
+                    {
+                        Console.WriteLine("  Enrolled Students:");
+                        foreach (var enrollment in course.Enrollments)
+                        {
+                            Console.WriteLine($"    - {enrollment.StudentName} {enrollment.StudentFamilyName}, Enrolled on: {enrollment.EnrollmentDate.ToShortDateString()}");
+                        }
+                    }
+                }
+            }
+            else
+            {
+                Console.WriteLine("No courses found with more than 3 students enrolled.");
             }
         }
 
