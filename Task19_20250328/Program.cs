@@ -92,6 +92,43 @@ Enrollment (Запись): представляет собой связь меж
 
                 // 1) Список студентов и количество курсов, на которые они записаны.
                 PrintStudentsWithCourses(db);
+
+                // 2) Курсы, на которые записано больше 10 студентов.
+                PrintPopularCourses(db);
+            }
+        }
+
+        // 2) Курсы, на которые записано больше 10 студентов.
+        public static void PrintPopularCourses(ApplicationContext db)
+        {
+            var courses = db.Courses
+                .Where(c => c.Enrollments.Count() > 3) // Only courses with more than 3 students
+                .Select(c => new
+                {
+                    c.Title,
+                    StudentCount = c.Enrollments.Count(),
+                    Students = c.Enrollments.Select(e => new
+                    {
+                        e.Student.Name,
+                        e.Grade
+                    }).ToList()
+                })
+                .ToList();
+
+            Console.WriteLine("\n----------------------------------\n");
+
+            foreach (var course in courses)
+            {
+                Console.WriteLine($"Course: {course.Title}");
+                Console.WriteLine($"Total Students Enrolled: {course.StudentCount}");
+
+                Console.WriteLine("Enrolled Students:");
+                foreach (var student in course.Students)
+                {
+                    Console.WriteLine($" - {student.Name}, Grade: {student.Grade}");
+                }
+
+                Console.WriteLine("\n-----\n");
             }
         }
 
