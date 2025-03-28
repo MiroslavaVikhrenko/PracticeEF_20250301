@@ -1,4 +1,6 @@
-﻿namespace Task18_20250328
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace Task18_20250328
 {
     /*
      Разработайте систему управления студентами и курсами для университета. В системе есть информация о студентах, 
@@ -126,6 +128,41 @@
 
                 // 4) Получить список курсов, на которые зачислено более 5 студентов.
                 GetCoursesWithMoreThanThreeStudents(db);
+
+                // 5) Получить список студентов, старше 25 лет.
+                GetStudentsOlderThan21(db);
+            }
+        }
+
+        // 5) Получить список студентов, старше 25 лет.
+        public static void GetStudentsOlderThan21(ApplicationContext db)
+        {
+            // Get today's date
+            DateTime today = DateTime.Today;
+
+            // Query students older than 21
+            var students = db.Students
+                             .Where(s => EF.Functions.DateDiffYear(s.BirthDay, today) > 21) // Calculate age using DateDiffYear
+                             .Select(s => new
+                             {
+                                 FullName = s.Name + " " + s.FamilyName,
+                                 Age = EF.Functions.DateDiffYear(s.BirthDay, today) // Calculate age
+                             })
+                             .ToList();
+
+            // Print results
+            Console.WriteLine("\n----------------------------------\n");
+            if (students.Any())
+            {
+                Console.WriteLine("Students older than 21 years:");
+                foreach (var student in students)
+                {
+                    Console.WriteLine($"- {student.FullName}, Age: {student.Age}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("No students found who are older than 21.");
             }
         }
 
