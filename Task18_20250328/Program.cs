@@ -159,6 +159,41 @@ namespace Task18_20250328
 
                 // 14) Получить список студентов, зачисленных одновременно на два определенных курса.
                 GetStudentsEnrolledInTwoCourses(db, 1, 10);
+
+                // 15) Получить количество студентов на каждом курсе.
+                GetAllCoursesWithEnrollments(db);
+            }
+        }
+        // 15) Получить количество студентов на каждом курсе.
+        public static void GetAllCoursesWithEnrollments(ApplicationContext db)
+        {
+            var coursesWithEnrollments = db.Courses
+                .Select(c => new
+                {
+                    c.Name,
+                    c.Description,
+                    Students = c.Enrollments.Select(e => e.Student.Name + " " + e.Student.FamilyName).ToList()
+                })
+                .ToList();
+
+            Console.WriteLine("\n----------------------------------\n");
+
+            foreach (var course in coursesWithEnrollments)
+            {                
+                Console.WriteLine($"\nCourse: {course.Name} - {course.Description}");
+                Console.WriteLine($"Total Students Enrolled: {course.Students.Count}");
+
+                if (course.Students.Any())
+                {
+                    foreach (var student in course.Students)
+                    {
+                        Console.WriteLine($"  - {student}");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("  No students enrolled.");
+                }
             }
         }
         // 14) Получить список студентов, зачисленных одновременно на два определенных курса.
