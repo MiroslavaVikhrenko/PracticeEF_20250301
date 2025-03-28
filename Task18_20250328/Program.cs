@@ -149,6 +149,51 @@ namespace Task18_20250328
 
                 // 11) Получить список студентов, отсортированных по фамилии в алфавитном порядке.
                 GetStudentsSortedByFamilyName(db);
+
+                // 12) Получить список студентов вместе с информацией о зачислениях на курсы.
+                GetAllStudentsWithEnrollments(db);
+            }
+        }
+        // 12) Получить список студентов вместе с информацией о зачислениях на курсы.
+        public static void GetAllStudentsWithEnrollments(ApplicationContext db)
+        {
+            var students = db.Students
+                .Select(s => new
+                {
+                    s.Id,
+                    FullName = s.Name + " " + s.FamilyName,
+                    Enrollments = s.Enrollments.Select(e => new
+                    {
+                        e.Course.Name,
+                        e.EnrollmentDate
+                    }).ToList()
+                })
+                .ToList(); // Forces execution in SQL Server
+
+            if (students.Any())
+            {
+                Console.WriteLine("\n----------------------------------\n");
+                Console.WriteLine("Students and their enrollments:");
+                foreach (var student in students)
+                {
+                    Console.WriteLine($"\nID: {student.Id}, Name: {student.FullName}");
+                    if (student.Enrollments.Any())
+                    {
+                        Console.WriteLine("  Enrollments:");
+                        foreach (var enrollment in student.Enrollments)
+                        {
+                            Console.WriteLine($"  - {enrollment.Name}: {enrollment.EnrollmentDate:yyyy-MM-dd}");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("  No enrollments.");
+                    }
+                }
+            }
+            else
+            {
+                Console.WriteLine("No students found in the database.");
             }
         }
         // 11) Получить список студентов, отсортированных по фамилии в алфавитном порядке.
