@@ -120,6 +120,69 @@
 
                 // 2) Получить список курсов, на которых учит определенный преподаватель.
                 GetAllCoursesByInstructor(1, db);
+
+                // 3) Получить список курсов, на которых учит определенный преподаватель, вместе с именами студентов, зачисленных на каждый курс.
+                GetAllCoursesWithStudentsByInstructor(2, db);
+            }
+        }
+
+        // 3) Получить список курсов, на которых учит определенный преподаватель, вместе с именами студентов, зачисленных на каждый курс.
+        public static void GetAllCoursesWithStudentsByInstructor(int instructorId, ApplicationContext db)
+        {
+            // Fetch instructor details
+            var instructor = db.Instructors.FirstOrDefault(i => i.Id == instructorId);
+
+            if (instructor == null)
+            {
+                Console.WriteLine($"Instructor with ID {instructorId} not found.");
+                return;
+            }
+
+            // Fetch courses taught by this instructor, including enrolled students
+            var coursesWithStudents = db.Courses
+                                        .Where(c => c.InstructorId == instructorId)
+                                        .Select(c => new
+                                        {
+                                            CourseName = c.Name,
+                                            CourseDescription = c.Description,
+                                            Enrollments = c.Enrollments.Select(e => new
+                                            {
+                                                StudentName = e.Student.Name,
+                                                StudentFamilyName = e.Student.FamilyName,
+                                                EnrollmentDate = e.EnrollmentDate
+                                            }).ToList()
+                                        })
+                                        .ToList();
+
+            // Print instructor's name
+            Console.WriteLine("\n----------------------------------\n");
+            Console.WriteLine($"Instructor: {instructor.Name} {instructor.FamilyName}");
+
+            // Print courses and enrolled students in a hierarchical format
+            if (coursesWithStudents.Any())
+            {
+                Console.WriteLine("Courses taught:");
+                foreach (var course in coursesWithStudents)
+                {
+                    Console.WriteLine($"- {course.CourseName} ({course.CourseDescription})");
+
+                    if (course.Enrollments.Any())
+                    {
+                        Console.WriteLine("  Enrolled Students:");
+                        foreach (var enrollment in course.Enrollments)
+                        {
+                            Console.WriteLine($"    - {enrollment.StudentName} {enrollment.StudentFamilyName}, Enrolled on: {enrollment.EnrollmentDate.ToShortDateString()}");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("  No students enrolled in this course.");
+                    }
+                }
+            }
+            else
+            {
+                Console.WriteLine("This instructor does not teach any courses.");
             }
         }
         // 2) Получить список курсов, на которых учит определенный преподаватель.
