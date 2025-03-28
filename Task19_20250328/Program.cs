@@ -1,4 +1,6 @@
-﻿namespace Task19_20250328
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace Task19_20250328
 {
     /*
      У вас есть база данных для системы управления университетом. Существуют следующие сущности: 
@@ -106,6 +108,48 @@ Enrollment (Запись): представляет собой связь меж
 
                 // 5) Лучший студент по конкретному курсу (на основе оценки).
                 PrintTopStudentInCourse(db, 1);
+
+                // 6) Количество курсов, на которые записаны студенты старше 30 лет.
+                PrintCoursesWithOlderStudents(db);
+            }
+        }
+        // 6) Количество курсов, на которые записаны студенты старше 30 лет.
+        public static void PrintCoursesWithOlderStudents(ApplicationContext db)
+        {
+            DateTime today = DateTime.Today;
+            int ageThreshold = 25;
+
+            var coursesWithOlderStudents = db.Courses
+                .Select(c => new
+                {
+                    c.Title,
+                    Students = c.Enrollments
+                        .Where(e => EF.Functions.DateDiffYear(e.Student.DateOfBirth, today) > ageThreshold) // Calculate age
+                        .Select(e => new
+                        {
+                            e.Student.Name,
+                            Age = EF.Functions.DateDiffYear(e.Student.DateOfBirth, today),
+                            e.Grade
+                        })
+                        .ToList()
+                })
+                .Where(c => c.Students.Any()) // Only courses with students older than 23
+                .ToList();
+
+            Console.WriteLine("\n----------------------------------\n");
+            Console.WriteLine($"There are {coursesWithOlderStudents.Count} courses where students older than {ageThreshold} years are enrolled.");
+
+            foreach (var course in coursesWithOlderStudents)
+            {
+                Console.WriteLine($"\nCourse: {course.Title}");
+
+                Console.WriteLine("Students older than 23:");
+                foreach (var student in course.Students)
+                {
+                    Console.WriteLine($" - {student.Name}, Age: {student.Age}, Grade: {student.Grade}");
+                }
+
+                Console.WriteLine("\n-----\n");
             }
         }
         // 5) Лучший студент по конкретному курсу (на основе оценки).
