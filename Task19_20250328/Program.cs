@@ -34,7 +34,9 @@ Enrollment (Запись): представляет собой связь меж
                     new Student(){Name = "Kenji", DateOfBirth = new DateTime(2004,07,19)},
                     new Student(){Name = "Midori", DateOfBirth = new DateTime(2005,08,25)},
                     new Student(){Name = "Yuka", DateOfBirth = new DateTime(2006,09,21)},
-                    new Student(){Name = "Akiko", DateOfBirth = new DateTime(2005,10,15)}
+                    new Student(){Name = "Akiko", DateOfBirth = new DateTime(2005,10,15)},
+                    new Student(){Name = "Ken", DateOfBirth = new DateTime(2003,11,12)},
+                    new Student(){Name = "Fuyuko", DateOfBirth = new DateTime(2007,12,19)}
                 };
                 db.Students.AddRange(students);
                 db.SaveChanges();
@@ -98,6 +100,31 @@ Enrollment (Запись): представляет собой связь меж
 
                 // 3) Средняя оценка студента по всем курсам.
                 PrintStudentsWithGrades(db);
+
+                // 4) Студенты, которые не записаны ни на один курс.
+                PrintStudentsWithoutCourses(db);
+            }
+        }
+        // 4) Студенты, которые не записаны ни на один курс.
+        public static void PrintStudentsWithoutCourses(ApplicationContext db)
+        {
+            var studentsWithoutCourses = db.Students
+                .Where(s => !s.Enrollments.Any()) // Students with no enrollments
+                .Select(s => s.Name) // Only select the Name
+                .ToList();
+
+            if (studentsWithoutCourses.Any())
+            {
+                Console.WriteLine("\n----------------------------------\n");
+                Console.WriteLine("Students not enrolled in any courses:");
+                foreach (var student in studentsWithoutCourses)
+                {
+                    Console.WriteLine($" - {student}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("All students are enrolled in at least one course.");
             }
         }
         // 3) Средняя оценка студента по всем курсам.
