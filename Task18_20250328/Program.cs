@@ -117,9 +117,46 @@
 
                 // 1) Получить список студентов, зачисленных на определенный курс.
                 GetAllStudentsByCourse(1, db);
+
+                // 2) Получить список курсов, на которых учит определенный преподаватель.
+                GetAllCoursesByInstructor(1, db);
             }
         }
+        // 2) Получить список курсов, на которых учит определенный преподаватель.
+        public static void GetAllCoursesByInstructor(int instructorId, ApplicationContext db)
+        {
+            // Fetch instructor details
+            var instructor = db.Instructors.FirstOrDefault(i => i.Id == instructorId);
 
+            if (instructor == null)
+            {
+                Console.WriteLine($"Instructor with ID {instructorId} not found.");
+                return;
+            }
+
+            // Fetch courses taught by this instructor
+            var courses = db.Courses
+                            .Where(c => c.InstructorId == instructorId)
+                            .ToList();
+
+            // Print instructor's name
+            Console.WriteLine("\n----------------------------------\n");
+            Console.WriteLine($"Instructor: {instructor.Name} {instructor.FamilyName}");
+
+            // Print courses or indicate if none exist
+            if (courses.Any())
+            {
+                Console.WriteLine("Courses taught:");
+                foreach (var course in courses)
+                {
+                    Console.WriteLine($"- {course.Name}: {course.Description}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("This instructor does not teach any courses.");
+            }
+        }
         // 1) Получить список студентов, зачисленных на определенный курс.
         public static void GetAllStudentsByCourse(int courseId, ApplicationContext db)
         {
@@ -139,6 +176,7 @@
                              .ToList();
 
             // Print results
+            Console.WriteLine("\n----------------------------------\n");
             Console.WriteLine($"Course: {course.Name} ({course.Description})");
 
             if (students.Any())
