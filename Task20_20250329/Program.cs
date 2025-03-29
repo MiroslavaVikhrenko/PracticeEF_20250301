@@ -51,6 +51,50 @@ namespace Task20_20250329
 
             // Поезда у которых длительность маршрута более 5 часов.
             GetTrainsWithLongTravelTime();
+
+            // Общую информация о станции и ее поездах.
+            PrintAllStationsWithTrains();
+        }
+
+        // Общую информация о станции и ее поездах.
+        public static void PrintAllStationsWithTrains()
+        {
+            using (ApplicationContext db = new ApplicationContext())
+            {
+                var stationsWithTrains = db.Stations
+                    .FromSqlRaw(@"
+                SELECT s.Id, s.Name 
+                FROM [Stations] s")
+                    .ToList();
+
+                Console.WriteLine("\n----------------------------------\n");
+
+                foreach (var station in stationsWithTrains)
+                {
+                    Console.WriteLine($"\nStation ID: {station.Id}, Name: {station.Name}");
+                    Console.WriteLine("Trains at this station:");
+
+                    var trains = db.Trains
+                        .FromSqlRaw(@"
+                    SELECT t.* 
+                    FROM [Trains] t
+                    WHERE t.StationId = {0}", station.Id)
+                        .ToList();
+
+                    if (trains.Count == 0)
+                    {
+                        Console.WriteLine("   No trains available.");
+                    }
+                    else
+                    {
+                        foreach (var train in trains)
+                        {
+                            Console.WriteLine($"   Train ID: {train.Id}, Number: {train.Number}, Model: {train.Model}, " +
+                                              $"Manufacturing Date: {train.ManufacturingDate}, Travel Time: {train.TravelTime}");
+                        }
+                    }
+                }
+            }
         }
 
         // Поезда у которых длительность маршрута более 5 часов.
