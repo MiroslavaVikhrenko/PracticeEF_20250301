@@ -66,6 +66,39 @@ namespace Task20_20250329
 
             // Получить станции, у которых в наличии хотя бы один поезд с длительность маршрутка менее 4 часов.
             PrintStationsWithShortTravelTimeTrains();
+
+            // Вывести все станции без поездов (на которых не будет поездов при выполнении LEFT JOIN).
+            PrintStationsWithoutTrains();
+        }
+
+        // Вывести все станции без поездов (на которых не будет поездов при выполнении LEFT JOIN).
+        public static void PrintStationsWithoutTrains()
+        {
+            using (ApplicationContext db = new ApplicationContext())
+            {
+                // Fetch stations that have NO trains using LEFT JOIN and WHERE t.Id IS NULL
+                var stations = db.Stations
+                    .FromSqlRaw(@"
+                SELECT s.Id, s.Name 
+                FROM [Stations] s
+                LEFT JOIN [Trains] t ON s.Id = t.StationId
+                WHERE t.Id IS NULL")
+                    .ToList();
+
+                Console.WriteLine("\n----------------------------------\n");
+                Console.WriteLine("\nStations without any trains:");
+
+                if (stations.Count == 0)
+                {
+                    Console.WriteLine("All stations have at least one train.");
+                    return;
+                }
+
+                foreach (var station in stations)
+                {
+                    Console.WriteLine($"Station ID: {station.Id}, Name: {station.Name}");
+                }
+            }
         }
 
         // Получить станции, у которых в наличии хотя бы один поезд с длительность маршрутка менее 4 часов.
