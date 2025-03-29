@@ -15,12 +15,33 @@ namespace Task21_20250329
         {
             Database.EnsureDeleted();
             Database.EnsureCreated();
+            CreateStoredProcedure();
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder
                 .UseSqlServer("Data Source=MIRUAHUA;Initial Catalog=March_UserCompanyMgmtSystem;Integrated Security=True;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False");
+        }
+        private void CreateStoredProcedure()
+        {
+            string sp = @"
+                CREATE OR ALTER PROCEDURE GetAllUsersAndCompanies
+                AS
+                BEGIN
+                    SET NOCOUNT ON;
+                    SELECT 
+                        u.Id AS UserId, 
+                        u.Name AS UserName, 
+                        u.Age, 
+                        u.CompanyId, 
+                        c.Id AS CompanyId, 
+                        c.Name AS CompanyName
+                    FROM Users u
+                    LEFT JOIN Companies c ON u.CompanyId = c.Id;
+                END;";
+
+            this.Database.ExecuteSqlRaw(sp);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
