@@ -13,8 +13,8 @@ namespace Task20_20250329
         public DbSet<Station> Stations { get; set; } = null!;
         public ApplicationContext()
         {
-            Database.EnsureDeleted();
-            Database.EnsureCreated();
+            //Database.EnsureDeleted();
+            //Database.EnsureCreated();
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
