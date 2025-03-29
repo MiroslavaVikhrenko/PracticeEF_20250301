@@ -2,6 +2,9 @@
 using System.Data.Common;
 using System.Data;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.Extensions.Options;
+using Microsoft.Data.SqlClient;
+using System;
 
 namespace Task21_20250329
 {
@@ -17,70 +20,128 @@ namespace Task21_20250329
         {
             using (ApplicationContext db = new ApplicationContext())
             {
-                List<Company> companies = new List<Company>()
+                db.Database.EnsureDeleted();
+                db.Database.EnsureCreated();
+
+                Console.WriteLine("Creating stored procedures...");
+                CreateStoredProcedures(db);
+
+                Console.WriteLine("Testing stored procedures...\n");
+
+                // Fetch Users with their Companies
+                FetchUsersWithCompanies();
+
+                // Get Users with name like 'Tom'
+                GetUsersByNamePattern("Tom");
+
+                // Get Average Age
+                GetAverageAge();
+            }
+
+        }
+        public static void GetAverageAge()
+        {
+            Console.WriteLine("\n--- Average Age of Users ---");
+
+            using (var db = new ApplicationContext())
+            using (var connection = new SqlConnection(db.Database.GetDbConnection().ConnectionString))
+            {
+                connection.Open();
+
+                using (var command = new SqlCommand("GetAverageUserAge", connection))
                 {
-                    new Company(){Name = "Google"},
-                    new Company(){Name = "Microsoft"},
-                    new Company(){Name = "Bell"},
-                    new Company(){Name = "Telus"}
-                };
-                db.Companies.AddRange(companies);
-                db.SaveChanges();
+                    command.CommandType = System.Data.CommandType.StoredProcedure;
 
-                List<User> users = new List<User>()
-                {
-                    new User() { Name = "Tanaka", Age = 35, CompanyId = 1 },
-                    new User() { Name = "Yamada", Age = 45, CompanyId = 1 },
-                    new User() { Name = "Hashimoto", Age = 50, CompanyId = 1 },
-                    new User() { Name = "Ishida", Age = 60, CompanyId = 2 },
-                    new User() { Name = "Takeda", Age = 23, CompanyId = 2 },
-                    new User() { Name = "Sato", Age = 31, CompanyId = 2 },
-                    new User() { Name = "Kobayashi", Age = 47, CompanyId = 3 },
-                    new User() { Name = "Higashiyama", Age = 68, CompanyId = 3 },
-                    new User() { Name = "Sasayama", Age = 29, CompanyId = 4 },
-                    new User() { Name = "Okuda", Age = 49, CompanyId = 4 },
-                    new User() { Name = "Ishizuka", Age = 56, CompanyId = 4 }
-                };
+                    // Define output parameter
+                    var avgAgeParam = new SqlParameter("@AvgAge", System.Data.SqlDbType.Float)
+                    {
+                        Direction = System.Data.ParameterDirection.Output
+                    };
 
-                db.Users.AddRange(users);
-                db.SaveChanges();
+                    command.Parameters.Add(avgAgeParam);
+                    command.ExecuteNonQuery();
 
-                // GetAllUsersAndCompanies SP
-                ExecuteStoredProcedure(db);
+                    // Read the output parameter
+                    double avgAge = (double)command.Parameters["@AvgAge"].Value;
+                    Console.WriteLine($"Average Age: {avgAge:F2}");
+                }
             }
         }
-
-        static void ExecuteStoredProcedure(ApplicationContext db)
+        public static void GetUsersByNamePattern(string namePattern)
         {
-            //  Open a database connection from the existing DbContext
-            using (DbConnection conn = db.Database.GetDbConnection())
+            Console.WriteLine($"\n--- Users with name like '{namePattern}' ---");
+
+            using (var db = new ApplicationContext())
+            using (var connection = new SqlConnection(db.Database.GetDbConnection().ConnectionString))
             {
-                conn.Open(); // Open connection
+                connection.Open();
 
-                using (DbCommand cmd = conn.CreateCommand())
+                using (var command = new SqlCommand("GetUsersByNamePattern", connection))
                 {
-                    cmd.CommandText = "GetAllUsersAndCompanies"; // Stored procedure name
-                    cmd.CommandType = CommandType.StoredProcedure;
+                    command.CommandType = System.Data.CommandType.StoredProcedure;
+                    command.Parameters.AddWithValue("@NamePattern", namePattern);
 
-                    using (DbDataReader reader = cmd.ExecuteReader())
+                    using (var reader = command.ExecuteReader())
                     {
-                        Console.WriteLine("\n----------------------------------\n");
-                        Console.WriteLine(" All Users and Their Companies:");
                         while (reader.Read())
                         {
-                            // reader.GetOrdinal("CompanyName")
-                            // Gets the column index of "CompanyName".
-                            int userId = reader.GetInt32(reader.GetOrdinal("UserId"));
-                            string userName = reader.GetString(reader.GetOrdinal("UserName"));
-                            int age = reader.GetInt32(reader.GetOrdinal("Age"));
-                            int companyId = reader.IsDBNull(reader.GetOrdinal("CompanyId")) ? 0 : reader.GetInt32(reader.GetOrdinal("CompanyId"));
-                            string companyName = reader.IsDBNull(reader.GetOrdinal("CompanyName")) ? "No Company" : reader.GetString(reader.GetOrdinal("CompanyName"));
-
-                            Console.WriteLine($" User: {userName} (Age: {age}) |  Company: {companyName}");
+                            Console.WriteLine($"User: {reader["Name"]} | Age: {reader["Age"]}");
                         }
                     }
                 }
             }
+        }
+        public static void FetchUsersWithCompanies()
+        {
+            Console.WriteLine("\n--- Users and Their Companies ---");
+
+            using (var db = new ApplicationContext())
+            using (var connection = new SqlConnection(db.Database.GetDbConnection().ConnectionString))
+            {
+                connection.Open();
+
+                using (var command = new SqlCommand("GetUsersWithCompanies", connection))
+                {
+                    command.CommandType = System.Data.CommandType.StoredProcedure;
+
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            Console.WriteLine($"User: {reader["Name"]} | Age: {reader["Age"]} | Company: {reader["CompanyName"]}");
+                        }
+                    }
+                }
+            }
+        }
+        public static void CreateStoredProcedures(ApplicationContext db)
+        {
+            db.Database.ExecuteSqlRaw(@"
+        CREATE PROCEDURE dbo.GetUsersWithCompanies
+        AS
+        BEGIN
+            SELECT u.Id, u.Name, u.Age, c.Name AS CompanyName
+            FROM Users u
+            INNER JOIN Companies c ON u.CompanyId = c.Id;
+        END;");
+
+            db.Database.ExecuteSqlRaw(@"
+        CREATE PROCEDURE dbo.GetUsersByNamePattern
+            @NamePattern NVARCHAR(100)
+        AS
+        BEGIN
+            SELECT * FROM Users WHERE Name LIKE '%' + @NamePattern + '%';
+        END;");
+
+            db.Database.ExecuteSqlRaw(@"
+        CREATE PROCEDURE dbo.GetAverageUserAge
+            @AvgAge FLOAT OUTPUT
+        AS
+        BEGIN
+            SELECT @AvgAge = AVG(CAST(Age AS FLOAT)) FROM Users;
+        END;");
+
+            Console.WriteLine("Stored procedures created successfully.");
         }
     }
 }
