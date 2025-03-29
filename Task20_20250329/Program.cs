@@ -63,10 +63,57 @@ namespace Task20_20250329
 
             // Все поезда, у которых возраст более 15 лет с текущей даты.
             PrintTrainsOlderThanFiveYears();
+
+            // Получить станции, у которых в наличии хотя бы один поезд с длительность маршрутка менее 4 часов.
+            PrintStationsWithShortTravelTimeTrains();
+        }
+
+        // Получить станции, у которых в наличии хотя бы один поезд с длительность маршрутка менее 4 часов.
+        public static void PrintStationsWithShortTravelTimeTrains()
+        {
+            using (ApplicationContext db = new ApplicationContext())
+            {
+                // Fetch stations where at least one train has TravelTime < 4 hours
+                var stations = db.Stations
+                    .FromSqlRaw(@"
+                SELECT DISTINCT s.Id, s.Name 
+                FROM [Stations] s
+                JOIN [Trains] t ON s.Id = t.StationId
+                WHERE t.TravelTime < '04:00:00'")
+                    .ToList();
+
+                Console.WriteLine("\n----------------------------------\n");
+                Console.WriteLine("\nStations with at least one train having TravelTime < 4 hours:");
+
+                if (stations.Count == 0)
+                {
+                    Console.WriteLine("No stations found with trains having TravelTime < 4 hours.");
+                    return;
+                }
+
+                foreach (var station in stations)
+                {
+                    Console.WriteLine($"\nStation ID: {station.Id}, Name: {station.Name}");
+                    Console.WriteLine("Trains with TravelTime < 4 hours:");
+
+                    // Fetch trains with TravelTime < 4 hours for this station
+                    var trains = db.Trains
+                        .FromSqlRaw(@"
+                    SELECT * 
+                    FROM [Trains] 
+                    WHERE StationId = {0} AND TravelTime < '04:00:00'", station.Id)
+                        .ToList();
+
+                    foreach (var train in trains)
+                    {
+                        Console.WriteLine($"   Train ID: {train.Id}, Number: {train.Number}, Model: {train.Model}, " +
+                                          $"Manufacturing Date: {train.ManufacturingDate}, Travel Time: {train.TravelTime}");
+                    }
+                }
+            }
         }
 
         // Все поезда, у которых возраст более 15 лет с текущей даты.
-
         public static void PrintTrainsOlderThanFiveYears()
         {
             using (ApplicationContext db = new ApplicationContext())
