@@ -1,4 +1,9 @@
-﻿namespace Task21_20250329
+﻿using Microsoft.EntityFrameworkCore;
+using System.Data.Common;
+using System.Data;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+
+namespace Task21_20250329
 {
     /*
      Используя таблицы «Users» и «Companies», создать 3 хранимых процедуры:
@@ -39,6 +44,42 @@
 
                 db.Users.AddRange(users);
                 db.SaveChanges();
+
+                // GetAllUsersAndCompanies SP
+                ExecuteStoredProcedure(db);
+            }
+        }
+
+        static void ExecuteStoredProcedure(ApplicationContext db)
+        {
+            //  Open a database connection from the existing DbContext
+            using (DbConnection conn = db.Database.GetDbConnection())
+            {
+                conn.Open(); // Open connection
+
+                using (DbCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = "GetAllUsersAndCompanies"; // Stored procedure name
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    using (DbDataReader reader = cmd.ExecuteReader())
+                    {
+                        Console.WriteLine("\n----------------------------------\n");
+                        Console.WriteLine(" All Users and Their Companies:");
+                        while (reader.Read())
+                        {
+                            // reader.GetOrdinal("CompanyName")
+                            // Gets the column index of "CompanyName".
+                            int userId = reader.GetInt32(reader.GetOrdinal("UserId"));
+                            string userName = reader.GetString(reader.GetOrdinal("UserName"));
+                            int age = reader.GetInt32(reader.GetOrdinal("Age"));
+                            int companyId = reader.IsDBNull(reader.GetOrdinal("CompanyId")) ? 0 : reader.GetInt32(reader.GetOrdinal("CompanyId"));
+                            string companyName = reader.IsDBNull(reader.GetOrdinal("CompanyName")) ? "No Company" : reader.GetString(reader.GetOrdinal("CompanyName"));
+
+                            Console.WriteLine($" User: {userName} (Age: {age}) |  Company: {companyName}");
+                        }
+                    }
+                }
             }
         }
     }
