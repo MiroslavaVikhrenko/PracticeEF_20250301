@@ -48,6 +48,32 @@ namespace Task20_20250329
             // Добавить данные про поезда.
             Train t = new Train() { Number = "352", Model = "M3", TravelTime = new TimeSpan(5, 30, 10), ManufacturingDate = new DateOnly(2021, 03, 01), StationId = 1 };
             //AddTrain(t);
+
+            // Поезда у которых длительность маршрута более 5 часов.
+            GetTrainsWithLongTravelTime();
+        }
+
+        // Поезда у которых длительность маршрута более 5 часов.
+        public static void GetTrainsWithLongTravelTime()
+        {
+            using (ApplicationContext db = new ApplicationContext())
+            {
+                // The startDate ('00:00:00') represents the zero-point in a day.
+                var trains = db.Trains
+            .FromSqlRaw(@"
+                SELECT t.*, s.Name AS StationName 
+                FROM [Trains] t
+                JOIN [Stations] s ON t.StationId = s.Id
+                WHERE DATEDIFF(HOUR, '00:00:00', t.[TravelTime]) > 3")
+            .ToList();
+
+                Console.WriteLine("\n----------------------------------\n");
+                Console.WriteLine("Trains with Travel Time > 3 hours:");
+                foreach (var train in trains)
+                {
+                    Console.WriteLine($"Train Number: {train.Number}, Model: {train.Model}, Travel Time: {train.TravelTime}");
+                }
+            }
         }
         // Добавить данные про станции и поезда.
         public static void AddTrain(Train train)
