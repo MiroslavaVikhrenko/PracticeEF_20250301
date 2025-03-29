@@ -54,8 +54,52 @@ namespace Task20_20250329
 
             // Общую информация о станции и ее поездах.
             PrintAllStationsWithTrains();
+
+            // Название станций у которой в наличии более 3-ех поездов.
+            PrintStationsWithMoreThanThreeTrains();
         }
 
+        // Название станций у которой в наличии более 3-ех поездов.
+        public static void PrintStationsWithMoreThanThreeTrains()
+        {
+            using (ApplicationContext db = new ApplicationContext())
+            {
+                // Fetch station IDs and names where train count > 3 using raw SQL
+                var stationData = db.Stations
+                    .FromSqlRaw(@"
+                SELECT s.Id, s.Name 
+                FROM [Stations] s
+                JOIN [Trains] t ON s.Id = t.StationId
+                GROUP BY s.Id, s.Name
+                HAVING COUNT(t.Id) > 3")
+                    .ToList();
+
+                Console.WriteLine("\n----------------------------------\n");
+
+                foreach (var station in stationData)
+                {
+                    // Count trains using LINQ (avoids mapping issues)
+                    int trainCount = db.Trains.Count(t => t.StationId == station.Id);
+
+                    Console.WriteLine($"\nStation ID: {station.Id}, Name: {station.Name}, Total Trains: {trainCount}");
+                    Console.WriteLine("Trains at this station:");
+
+                    // Fetch trains for this station
+                    var trains = db.Trains
+                        .FromSqlRaw(@"
+                    SELECT t.* 
+                    FROM [Trains] t
+                    WHERE t.StationId = {0}", station.Id)
+                        .ToList();
+
+                    foreach (var train in trains)
+                    {
+                        Console.WriteLine($"   Train ID: {train.Id}, Number: {train.Number}, Model: {train.Model}, " +
+                                          $"Manufacturing Date: {train.ManufacturingDate}, Travel Time: {train.TravelTime}");
+                    }
+                }
+            }
+        }
         // Общую информация о станции и ее поездах.
         public static void PrintAllStationsWithTrains()
         {
