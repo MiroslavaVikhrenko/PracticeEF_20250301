@@ -60,6 +60,43 @@ namespace Task20_20250329
 
             // Все поезда, модель которых начинается на подстроку «Pell».
             PrintTrainsWithModelContaining2();
+
+            // Все поезда, у которых возраст более 15 лет с текущей даты.
+            PrintTrainsOlderThanFiveYears();
+        }
+
+        // Все поезда, у которых возраст более 15 лет с текущей даты.
+
+        public static void PrintTrainsOlderThanFiveYears()
+        {
+            using (ApplicationContext db = new ApplicationContext())
+            {
+                // Query to fetch trains older than 5 years using DATEDIFF
+                var trains = db.Trains
+                    .FromSqlRaw(@"
+                SELECT *, DATEDIFF(YEAR, [ManufacturingDate], GETDATE()) AS Age
+                FROM [Trains]
+                WHERE DATEDIFF(YEAR, [ManufacturingDate], GETDATE()) > 5")
+                    .ToList();
+
+                Console.WriteLine("\n----------------------------------\n");
+                Console.WriteLine("\nTrains older than 5 years:");
+
+                if (trains.Count == 0)
+                {
+                    Console.WriteLine("No trains found that are older than 5 years.");
+                    return;
+                }
+
+                foreach (var train in trains)
+                {
+                    // Calculate train age dynamically in C# to match SQL result
+                    int trainAge = DateTime.Now.Year - train.ManufacturingDate.Year;
+
+                    Console.WriteLine($"Train ID: {train.Id}, Number: {train.Number}, Model: {train.Model}, " +
+                                      $"Manufacturing Date: {train.ManufacturingDate}, Travel Time: {train.TravelTime}, Age: {trainAge} years");
+                }
+            }
         }
 
         // Все поезда, модель которых начинается на подстроку «Pell».
