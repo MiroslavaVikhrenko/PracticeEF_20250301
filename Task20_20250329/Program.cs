@@ -57,6 +57,41 @@ namespace Task20_20250329
 
             // Название станций у которой в наличии более 3-ех поездов.
             PrintStationsWithMoreThanThreeTrains();
+
+            // Все поезда, модель которых начинается на подстроку «Pell».
+            PrintTrainsWithModelContaining2();
+        }
+
+        // Все поезда, модель которых начинается на подстроку «Pell».
+
+        public static void PrintTrainsWithModelContaining2()
+        {
+            using (ApplicationContext db = new ApplicationContext())
+            {
+                // Query trains where model contains '2' using SQL LIKE
+                var trains = db.Trains
+                    .FromSqlRaw(@"
+                SELECT * 
+                FROM [Trains] 
+                WHERE [Model] LIKE '%2%'")
+                    .ToList();
+
+                Console.WriteLine("\n----------------------------------\n");
+
+                Console.WriteLine("\nTrains where Model contains '2':");
+
+                if (trains.Count == 0)
+                {
+                    Console.WriteLine("No matching trains found.");
+                    return;
+                }
+
+                foreach (var train in trains)
+                {
+                    Console.WriteLine($"Train ID: {train.Id}, Number: {train.Number}, Model: {train.Model}, " +
+                                      $"Manufacturing Date: {train.ManufacturingDate}, Travel Time: {train.TravelTime}");
+                }
+            }
         }
 
         // Название станций у которой в наличии более 3-ех поездов.
