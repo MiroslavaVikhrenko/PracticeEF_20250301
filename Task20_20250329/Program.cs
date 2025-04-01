@@ -19,35 +19,35 @@ namespace Task20_20250329
     {
         static void Main(string[] args)
         {
-            //using (ApplicationContext db = new ApplicationContext())
-            //{
-            //    List<Station> stations = new List<Station>()
-            //    {
-            //        new Station(){Name = "Calgary"},
-            //        new Station(){Name = "Edmonton"}
-            //    };
-            //    db.Stations.AddRange(stations);
-            //    db.SaveChanges();
+            using (ApplicationContext db = new ApplicationContext())
+            {
+                List<Station> stations = new List<Station>()
+                {
+                    new Station(){Name = "Calgary"},
+                    new Station(){Name = "Edmonton"}
+                };
+                db.Stations.AddRange(stations);
+                db.SaveChanges();
 
-            //    List<Train> trains = new List<Train>()
-            //    {
-            //        new Train(){Number = "347", Model = "M1", TravelTime = new TimeSpan(5,30, 10), ManufacturingDate = new DateOnly(2017, 03, 01), StationId = 1},
-            //        new Train(){Number = "348", Model = "M2", TravelTime = new TimeSpan(4,30, 10), ManufacturingDate = new DateOnly(2019, 03, 01), StationId = 1},
-            //        new Train(){Number = "349", Model = "M1", TravelTime = new TimeSpan(2,30, 10), ManufacturingDate = new DateOnly(2021, 03, 01), StationId = 2},
-            //        new Train(){Number = "350", Model = "M2", TravelTime = new TimeSpan(6,30, 10), ManufacturingDate = new DateOnly(2023, 03, 01), StationId = 2},
-            //        new Train(){Number = "351", Model = "M1", TravelTime = new TimeSpan(1,30, 10), ManufacturingDate = new DateOnly(2015, 03, 01), StationId = 1},
-            //    };
-            //    db.Trains.AddRange(trains);
-            //    db.SaveChanges();               
-            //}
+                List<Train> trains = new List<Train>()
+                {
+                    new Train(){Number = "347", Model = "M1", TravelTime = new TimeSpan(5,30, 10), ManufacturingDate = new DateOnly(2017, 03, 01), StationId = 1},
+                    new Train(){Number = "348", Model = "M2", TravelTime = new TimeSpan(4,30, 10), ManufacturingDate = new DateOnly(2019, 03, 01), StationId = 1},
+                    new Train(){Number = "349", Model = "M1", TravelTime = new TimeSpan(2,30, 10), ManufacturingDate = new DateOnly(2021, 03, 01), StationId = 2},
+                    new Train(){Number = "350", Model = "M2", TravelTime = new TimeSpan(6,30, 10), ManufacturingDate = new DateOnly(2023, 03, 01), StationId = 2},
+                    new Train(){Number = "351", Model = "M1", TravelTime = new TimeSpan(1,30, 10), ManufacturingDate = new DateOnly(2015, 03, 01), StationId = 1},
+                };
+                db.Trains.AddRange(trains);
+                db.SaveChanges();
+            }
 
             // Добавить данные про станции.
             Station s = new Station() { Name = "Vancouver"};
-            //AddStation(s);
+            AddStation(s);
 
             // Добавить данные про поезда.
             Train t = new Train() { Number = "352", Model = "M3", TravelTime = new TimeSpan(5, 30, 10), ManufacturingDate = new DateOnly(2021, 03, 01), StationId = 1 };
-            //AddTrain(t);
+            AddTrain(t);
 
             // Поезда у которых длительность маршрута более 5 часов.
             GetTrainsWithLongTravelTime();
